@@ -155,5 +155,5 @@ if __name__ == "__main__":
     process_pdfs_for_text(
         input_dir=SCRIPT_DIR / "data/raw_pdfs",
         output_dir=SCRIPT_DIR / "data/extracted_text",
-        pattern="s11042-024-18872-y.pdf"  # Just use the filename instead of full path
+        pattern="rias_project\data/raw_pdfs\The_MUSCIMA_Dataset_for_Handwritten_Optical_Music_Recognition.pdf"  # Just use the filename instead of full path
     )

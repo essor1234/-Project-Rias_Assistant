@@ -94,7 +94,7 @@ def process_pdfs_in_directory(
         extract_images_from_pdf(str(pdf_path), str(pdf_out_dir))
 
         # ---- render pages ---------------------------------------------------
-        render_pdf_pages(str(pdf_path), str(pdf_out_dir), zoom=zoom)
+        # render_pdf_pages(str(pdf_path), str(pdf_out_dir), zoom=zoom)
 
     print(f"\nAll {len(pdf_paths)} PDF(s) processed successfully!")
     print(f"   Output saved in: {output_path}")
@@ -120,6 +120,6 @@ if __name__ == "__main__":
     # 3. Process **all PDFs that contain "2025"**
     process_pdfs_in_directory(
         input_dir=SCRIPT_DIR / "data/raw_pdfs",
-        output_dir=SCRIPT_DIR / "data/processed_outputs",
-        pattern="rias_project\data/raw_pdfs\s11042-024-18872-y.pdf"
+        output_dir=SCRIPT_DIR / "data/extracted_image",
+        pattern="rias_project\data/raw_pdfs\The_MUSCIMA_Dataset_for_Handwritten_Optical_Music_Recognition.pdf"
     )

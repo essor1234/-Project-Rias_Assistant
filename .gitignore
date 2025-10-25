@@ -1,32 +1,40 @@
-/resources
-/riasenv
+# Ignore virtual environment
+/riasenv/
 
-.env
-.png
-.jpg
-.jpeg
-.gif
-.bmp
-.tiff
-.ico
-.mp4
-.mov
-.avi
-.mkv
-.wav
-.mp3
-.log
-.tmp
-.txt
-.csv
-.db
-.sqlite     
-.pdf
-.zip
-.tar.gz
-.tar.bz2
-.rar
+# Ignore data folders
+/rias_project/data/
+/rias_project/data/resources/
+/resources/
+
+# Ignore file types
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.ico
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.wav
+*.mp3
+*.log
+*.tmp
+*.txt
+*.csv
+*.db
+*.sqlite
+*.pdf
+*.zip
+*.tar.gz
+*.tar.bz2
+*.rar
+
+# Ignore Python cache and IDE settings
 __pycache__/
 *.pyc
 .vscode/
 .idea/
+.env
