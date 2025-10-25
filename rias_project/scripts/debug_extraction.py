@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
+# generate_edu_materials.py
 import json
 import sys
 import datetime
@@ -8,18 +6,18 @@ import time
 from pathlib import Path
 from dotenv import load_dotenv
 from openai import OpenAI
-from docx import Document
-from docx.shared import Pt, Inches
-from docx.enum.text import WD_ALIGN_PARAGRAPH
+import pandas as pd
+from pptx import Presentation
+from pptx.util import Inches
+from zipfile import ZipFile
 
-# ---------------------------------------------------------------------
-# Logging setup
-# ---------------------------------------------------------------------
+# ----------------------------------------------------------------------
+# LOGGING SETUP — print to both console and log file
+# ----------------------------------------------------------------------
 class Tee:
     def __init__(self, *files): self.files = files
     def write(self, obj):
-        for f in self.files:
-            f.write(obj); f.flush()
+        for f in self.files: f.write(obj); f.flush()
     def flush(self):
         for f in self.files: f.flush()
 
@@ -27,57 +25,59 @@ timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 SCRIPT_DIR = Path(__file__).resolve().parent.parent
 LOG_DIR = SCRIPT_DIR / "logs"
 LOG_DIR.mkdir(exist_ok=True)
-LOG_FILE = LOG_DIR / f"summary_log_{timestamp}.txt"
+LOG_FILE = LOG_DIR / f"edu_materials_log_{timestamp}.txt"
 log_f = open(LOG_FILE, "w", encoding="utf-8")
 sys.stdout = Tee(sys.__stdout__, log_f)
 sys.stderr = Tee(sys.__stderr__, log_f)
+# ----------------------------------------------------------------------
 
 load_dotenv()
 client = OpenAI()
 
-# ---------------------------------------------------------------------
-# Config
-# ---------------------------------------------------------------------
-TXT_DIR      = SCRIPT_DIR / "data" / "extracted_text" / "test4"
-IMAGES_DIR   = SCRIPT_DIR / "data" / "extracted_image" / "test4"
-PROMPT_PATH  = SCRIPT_DIR / "prompts" / "prompt_test.txt"
-MODEL        = "gpt-5"
-MAX_TOKENS   = 20000
-MAX_RETRIES  = 3
+# ----------------------------------------------------------------------
+# CONFIGURATION
+# ----------------------------------------------------------------------
+TXT_DIR       = SCRIPT_DIR / "data" / "extracted_text" / "test4"
+PROMPT_PATH   = SCRIPT_DIR / "prompts" / "[Prompt]explain_and_lab.txt"
+MODEL         = "gpt-5"          # ✅ switched from gpt-4o to gpt-5
+MAX_TOKENS    = 20000
+TEMPERATURE   = 1
+MAX_RETRIES   = 3
+# ----------------------------------------------------------------------
 
-OUTPUT_DIR   = SCRIPT_DIR / "data" / "summarize_to_doc_output"
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-OUTPUT_DOCX  = OUTPUT_DIR / "Paper_Summary_Matched.docx"
 
-# ---------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------
-def truncate_text(text: str, limit: int = 30_000) -> str:
+def truncate_text(text: str, limit: int = 20000) -> str:
     return text if len(text) <= limit else text[:limit] + "\n\n[Text truncated for LLM]"
+
 
 def load_prompt() -> str:
     return PROMPT_PATH.read_text(encoding="utf-8")
 
-# ---------------------------------------------------------------------
-# LLM Call (GPT-5 robust version)
-# ---------------------------------------------------------------------
-def call_llm(prompt: str) -> str:
-    """
-    Call GPT-5 and guarantee a valid JSON output string like:
-        {"SummaryDoc": "<document text>"}
-    Handles empty responses, retries, and GPT-5's strict formatting rules.
-    """
 
+# ----------------------------------------------------------------------
+# LLM CALL — updated to GPT-5 format
+# ----------------------------------------------------------------------
+def call_llm(prompt_text: str) -> str:
+    """
+    Call GPT-5 with robust retry and enforced JSON schema.
+    Output schema:
+    {
+      "Slides": [...],
+      "Labs": [...]
+    }
+    """
     system_msg = {
         "role": "system",
         "content": (
-            "You are an academic summarizer and document restorer. "
-            "You MUST output only valid JSON with this schema:\n"
-            "{ \"SummaryDoc\": \"<full reconstructed academic document text including figure markers>\" }"
+            "You are an educational AI tutor that outputs structured JSON only.\n"
+            "Output schema:\n"
+            "{ \"Slides\": [ {\"Title\": str, \"Content\": str, ...} ], "
+            "\"Labs\": [ {\"Title\": str, \"Dataset\": {...}, \"CodeFiles\": [...] } ] }\n"
+            "Never output markdown or commentary — JSON only."
         ),
     }
 
-    user_msg = {"role": "user", "content": prompt}
+    user_msg = {"role": "user", "content": prompt_text}
 
     for attempt in range(MAX_RETRIES):
         try:
@@ -85,18 +85,17 @@ def call_llm(prompt: str) -> str:
                 model=MODEL,
                 messages=[system_msg, user_msg],
                 max_completion_tokens=MAX_TOKENS,
+                # temperature=TEMPERATURE,
                 response_format={"type": "json_object"},
             )
 
-            print("LLM response repr (short):", repr(resp)[:2000])
+            print(f"LLM response (attempt {attempt+1}) OK")
             choice = resp.choices[0]
-
             content = getattr(choice.message, "content", None)
             if not content:
-                print("⚠️ Empty content field from LLM.")
+                print("⚠️ Empty content from GPT-5")
                 continue
 
-            # Clean and return JSON text
             cleaned = clean_raw(content)
             return cleaned.strip()
 
@@ -105,12 +104,9 @@ def call_llm(prompt: str) -> str:
             if attempt == MAX_RETRIES - 1:
                 raise
             time.sleep(2 ** attempt)
-
     return ""
 
-# ---------------------------------------------------------------------
-# Clean output text before JSON parsing
-# ---------------------------------------------------------------------
+
 def clean_raw(raw: str) -> str:
     raw = raw.strip()
     if raw.startswith("```"):
@@ -119,129 +115,150 @@ def clean_raw(raw: str) -> str:
         raw = raw[4:].lstrip()
     return raw.strip()
 
-# ---------------------------------------------------------------------
-# Insert image + caption
-# ---------------------------------------------------------------------
-def insert_image(doc: Document, img_path: Path, caption: str):
-    try:
-        p_img = doc.add_paragraph()
-        p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        run = p_img.add_run()
-        run.add_picture(str(img_path), width=Inches(5.5))
 
-        p_cap = doc.add_paragraph(caption, style="Caption")
-        p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        for run_cap in p_cap.runs:
-            run_cap.italic = True
-        doc.add_paragraph()
-    except Exception as e:
-        print(f"Could not insert image {img_path.name}: {e}")
+# ----------------------------------------------------------------------
+# PowerPoint Writer
+# ----------------------------------------------------------------------
+def create_ppt(slides, output_path, raw_json_sample=None):
+    prs = Presentation()
+    for slide in slides:
+        layout = prs.slide_layouts[1] if len(prs.slide_layouts) > 1 else prs.slide_layouts[0]
+        s = prs.slides.add_slide(layout)
 
-def ensure_caption_style(doc: Document):
-    if "Caption" not in doc.styles:
-        style = doc.styles.add_style("Caption", 1)
-        style.font.name = "Times New Roman"
-        style.font.size = Pt(10)
-        style.font.italic = True
+        # Title
+        title = slide.get("Title") or slide.get("Heading") or "Untitled"
+        try:
+            s.shapes.title.text = str(title)
+        except Exception:
+            pass
 
-# ---------------------------------------------------------------------
-# Build DOCX
-# ---------------------------------------------------------------------
-def create_docx(summary_text: str, output_path: Path, images_dir: Path):
-    doc = Document()
-    normal = doc.styles["Normal"]
-    normal.font.name = "Times New Roman"
-    normal.font.size = Pt(12)
-
-    ensure_caption_style(doc)
-
-    image_map = {
-        p.name.lower(): p for p in images_dir.iterdir()
-        if p.suffix.lower() in {".png", ".jpg", ".jpeg", ".tif", ".bmp", ".svg"}
-    }
-
-    print(f"Found {len(image_map)} images in {images_dir}")
-
-    blocks = [b.strip() for b in summary_text.split("\n\n") if b.strip()]
-
-    for block in blocks:
-        line = block.strip()
-
-        if line.startswith("###"):
-            doc.add_heading(line.lstrip("# ").strip(), level=3)
-        elif line.startswith("##"):
-            doc.add_heading(line.lstrip("# ").strip(), level=2)
-        elif line.startswith("#"):
-            doc.add_heading(line.lstrip("# ").strip(), level=1)
-        elif line.startswith("[[FIGURE:"):
-            try:
-                inner = line.strip("[]").replace("FIGURE:", "").strip()
-                parts = [p.strip() for p in inner.split("|")]
-                filename = parts[0]
-                caption = " | ".join(parts[1:])
-                img_key = Path(filename).name.lower()
-
-                if img_key in image_map:
-                    insert_image(doc, image_map[img_key], caption)
-                    print(f"Inserted image: {filename}")
-                else:
-                    print(f"Image NOT FOUND: {filename}")
-                    p = doc.add_paragraph(f"[Image missing: {filename}] {caption}", style="Normal")
-                    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            except Exception as e:
-                print(f"Figure parsing error: {e}\n   Block: {line}")
-                doc.add_paragraph(line, style="Normal")
+        # Content
+        if slide.get("Content"):
+            content_text = slide.get("Content")
         else:
-            doc.add_paragraph(line, style="Normal")
+            parts = []
+            for k in ("Equation", "ConceptExplanation", "DeepExplanation", "RealExample", "ImageIdea"):
+                v = slide.get(k)
+                if v: parts.append(f"{k}: {v}")
+            content_text = "\n\n".join(parts) if parts else ""
 
-    doc.save(output_path)
-    print(f"DOCX saved → {output_path}")
+        # Text placeholder
+        body_shape = None
+        for shape in s.shapes:
+            if hasattr(shape, "text_frame") and shape != s.shapes.title:
+                body_shape = shape
+                break
 
-# ---------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------
+        if body_shape is None:
+            left, top, width, height = Inches(0.5), Inches(1.5), Inches(9), Inches(4.5)
+            body_shape = s.shapes.add_textbox(left, top, width, height)
+
+        body_shape.text_frame.clear()
+        p = body_shape.text_frame.paragraphs[0]
+        p.text = content_text[:4000] or "No detailed content available."
+
+    prs.save(output_path)
+    print(f"📊 Slides saved → {output_path}")
+
+    if raw_json_sample:
+        raw_path = Path(output_path).with_suffix(".raw.json")
+        raw_path.write_text(json.dumps(raw_json_sample, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"🔎 Raw JSON saved → {raw_path}")
+
+
+# ----------------------------------------------------------------------
+# ZIP Generator for Labs
+# ----------------------------------------------------------------------
+def create_lab_zip(labs, output_zip_path):
+    if not labs:
+        print("⚠️ No labs to package.")
+        return
+
+    with ZipFile(output_zip_path, "w") as zf:
+        for i, lab in enumerate(labs, start=1):
+            title = lab.get("Title", f"Lab_{i}")
+            dataset = lab.get("Dataset", {})
+            codefiles = lab.get("CodeFiles", [])
+
+            if dataset:
+                csv_name = dataset.get("filename", f"{title.replace(' ', '_')}.csv")
+                csv_content = "x,y,true_label,pred_label\n1,0.8,1,1\n2,0.3,1,0\n3,0.9,0,1\n"
+                zf.writestr(csv_name, csv_content)
+                readme = f"# Dataset: {csv_name}\n\n{dataset.get('description', '')}\n"
+                zf.writestr(f"{title}_README.txt", readme)
+
+            for j, cfile in enumerate(codefiles, start=1):
+                name = cfile.get("filename", f"exercise_{i}_{j}.py")
+                desc = cfile.get("description", "")
+                code_content = (
+                    f"# {desc}\n"
+                    f"import pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\n\n"
+                    f"data = pd.read_csv('{dataset.get('filename','data.csv')}')\n"
+                    f"print(data.head())\n"
+                )
+                zf.writestr(name, code_content)
+
+    print(f"🧩 Lab files saved → {output_zip_path}")
+
+
+# ----------------------------------------------------------------------
+# Main Processing
+# ----------------------------------------------------------------------
+def process_paper(txt_path, base_prompt, edu_output):
+    print(f"\n📘 Processing {txt_path.name}")
+    text = truncate_text(txt_path.read_text(encoding="utf-8"))
+    combined = base_prompt.replace("<<<DOCUMENT_TEXT>>>", text)
+
+    raw = call_llm(combined)
+    cleaned = clean_raw(raw)
+
+    if not cleaned:
+        print("⚠️ No response from GPT-5.")
+        return [], []
+
+    debug_raw_path = edu_output / f"{txt_path.stem}_raw.txt"
+    debug_raw_path.write_text(cleaned, encoding="utf-8")
+
+    try:
+        data = json.loads(cleaned)
+        slides = data.get("Slides", [])
+        labs = data.get("Labs", [])
+        print(f"✅ Parsed JSON: {len(slides)} slides, {len(labs)} labs")
+        return slides, labs, data
+    except json.JSONDecodeError as e:
+        print(f"❌ JSON parse error: {e}")
+        print("Raw output snippet:", cleaned[:1000])
+        return [], [], {}
+
+
 def main():
-    print("\n=== Summarization with Images ===")
-    base_prompt = load_prompt()
-
+    print("\n--- Generating Educational Materials (GPT-5) ---")
+    prompt = load_prompt()
     txt_files = sorted(TXT_DIR.glob("*.txt"))
     if not txt_files:
-        print(f"No .txt files in {TXT_DIR}")
+        print("❌ No .txt files found")
         return
 
-    combined = "\n\n".join(
-        f"--- FILE: {f.name} ---\n{truncate_text(f.read_text(encoding='utf-8'))}"
-        for f in txt_files
-    )
+    edu_output = SCRIPT_DIR / "data" / "edu_output"
+    edu_output.mkdir(parents=True, exist_ok=True)
 
-    prompt = base_prompt.replace("<<<DOCUMENT_TEXT>>>", combined)
-    print(f"Calling LLM ({MODEL}) …")
+    for txt_path in txt_files:
+        slides, labs, data = process_paper(txt_path, prompt, edu_output)
+        if not slides and not labs:
+            print(f"⚠️ No educational content generated for {txt_path.name}")
+            continue
 
-    raw = call_llm(prompt)
+        out_ppt = edu_output / f"slides_{txt_path.stem}.pptx"
+        out_zip = edu_output / f"lab_{txt_path.stem}.zip"
 
-    if not raw:
-        print("⚠️ Empty response from LLM. Aborting.")
-        return
+        if slides:
+            create_ppt(slides, out_ppt, raw_json_sample=data)
+        if labs:
+            create_lab_zip(labs, out_zip)
 
-    try:
-        parsed = json.loads(raw)
-    except json.JSONDecodeError:
-        cleaned = clean_raw(raw)
-        try:
-            parsed = json.loads(cleaned)
-        except json.JSONDecodeError:
-            print("❌ Final JSON decode failed. Dumping first 4000 chars:\n")
-            print(raw[:4000])
-            return
+    print("\n✅ All papers processed successfully!")
+    print(f"Log file saved → {LOG_FILE}")
 
-    summary = parsed.get("SummaryDoc", "").strip()
-    if not summary:
-        print("⚠️ LLM returned empty SummaryDoc.")
-        return
-
-    create_docx(summary, OUTPUT_DOCX, IMAGES_DIR)
-    print("\n✅ All done!")
-    print(f"Log: {LOG_FILE}")
 
 if __name__ == "__main__":
     main()
