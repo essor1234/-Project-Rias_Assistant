@@ -1,0 +1,81 @@
+{
+  "Slides": [
+    {
+      "Title": "What is Object Detection?",
+      "Equation": "",
+      "ImageIdea": "A scene with various objects like cars, people, and signs, each with a box around them.",
+      "ConceptExplanation": "Object detection is about finding and identifying objects in pictures.",
+      "DeepExplanation": "Imagine you have a picture of a busy street. Object detection helps a computer find and name things like cars, people, and traffic lights in that picture.",
+      "GraphIdea": "A simple diagram showing input image and output with labeled boxes.",
+      "Example": "Detecting cars and pedestrians in a street scene for autonomous driving.",
+      "Content": "Object detection helps computers see and understand what's in a picture. It's like when you look at a photo and can point out a car, a person, or a tree. This is important for things like self-driving cars, which need to know what's around them to drive safely."
+    },
+    {
+      "Title": "Understanding Precision in Object Detection",
+      "Equation": "Precision = \\frac{\\text{True Positives}}{\\text{True Positives} + \\text{False Positives}}",
+      "ImageIdea": "Two circles showing overlap between detected objects and actual objects.",
+      "ConceptExplanation": "Precision tells us how many of the detected objects were actually correct.",
+      "DeepExplanation": "Think of precision like a game where you have to pick apples from a basket. If you pick 10 apples and 8 are good, your precision is high because most of your picks were right.",
+      "GraphIdea": "A bar chart comparing true positives and false positives.",
+      "Example": "In a test, if a model detects 10 cars and 8 are actually cars, the precision is 80%.",
+      "Content": "Precision is about being correct when you say you've found something. If a computer says it found 10 cars but only 8 are really cars, its precision is 80%. This helps us know how often the computer is right when it detects something."
+    },
+    {
+      "Title": "The Role of Focal Loss in Object Detection",
+      "Equation": "FL(p_t) = -\\alpha_t (1 - p_t)^{\\gamma} \\log(p_t)",
+      "ImageIdea": "A graph showing how focal loss changes with different values of p_t.",
+      "ConceptExplanation": "Focal loss helps the model focus on harder-to-detect objects.",
+      "DeepExplanation": "Imagine you're learning to play piano. Focal loss is like a teacher who helps you focus more on the difficult parts of a song, so you get better at them.",
+      "GraphIdea": "A curve showing focal loss values for different probabilities.",
+      "Example": "In object detection, focal loss helps the model pay more attention to small or hard-to-see objects.",
+      "Content": "Focal loss is a special way to train models so they focus more on the tough parts, like small or hidden objects. It's like having a coach who helps you practice the tricky parts of a game, so you get better at them."
+    }
+  ],
+  "Labs": [
+    {
+      "Title": "Lab 1: Calculating Precision",
+      "Goal": "Learn how to calculate precision for object detection results.",
+      "Dataset": {
+        "filename": "object_detection_results.csv",
+        "description": "A small dataset with predicted and actual labels for objects in images."
+      },
+      "CodeFiles": [
+        {
+          "filename": "calculate_precision.py",
+          "description": "Python script to calculate precision from the dataset."
+        }
+      ],
+      "RelationToSlides": ["Understanding Precision in Object Detection"]
+    },
+    {
+      "Title": "Lab 2: Visualizing Object Detection",
+      "Goal": "Create visualizations to understand object detection results.",
+      "Dataset": {
+        "filename": "detection_visualization.csv",
+        "description": "Dataset with image paths and detection results."
+      },
+      "CodeFiles": [
+        {
+          "filename": "visualize_detections.py",
+          "description": "Python script to plot detected objects on images."
+        }
+      ],
+      "RelationToSlides": ["What is Object Detection?"]
+    },
+    {
+      "Title": "Lab 3: Exploring Focal Loss",
+      "Goal": "Understand how focal loss affects model training.",
+      "Dataset": {
+        "filename": "focal_loss_data.csv",
+        "description": "Dataset with probabilities and true labels for calculating focal loss."
+      },
+      "CodeFiles": [
+        {
+          "filename": "focal_loss_experiment.py",
+          "description": "Python script to compute and plot focal loss."
+        }
+      ],
+      "RelationToSlides": ["The Role of Focal Loss in Object Detection"]
+    }
+  ]
+}

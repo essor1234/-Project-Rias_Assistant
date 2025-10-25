@@ -1,0 +1,97 @@
+{
+  "Slides": [
+    {
+      "Title": "What is Object Detection?",
+      "Equation": "",
+      "ImageIdea": "A scene with various objects like cars, people, and signs, each with a box around them.",
+      "ConceptExplanation": "Object detection is about finding and identifying objects in pictures.",
+      "DeepExplanation": "Imagine you have a picture of a busy street. Object detection helps a computer find and name things like cars, people, and traffic lights in that picture.",
+      "GraphIdea": "A simple diagram showing input image and output with labeled boxes.",
+      "Example": "Detecting cars and pedestrians in a street scene for autonomous driving.",
+      "Content": "Object detection is like a game of 'I Spy' for computers. It helps them find and name objects in pictures, which is super important for things like self-driving cars to know what's around them."
+    },
+    {
+      "Title": "Two-Stage Detection: Faster R-CNN",
+      "Equation": "",
+      "ImageIdea": "Two-step process diagram: first finding regions, then classifying them.",
+      "ConceptExplanation": "Faster R-CNN looks at images in two steps to find objects.",
+      "DeepExplanation": "First, it guesses where objects might be, then it checks those guesses to see what the objects are. It's like first spotting something in the distance, then using binoculars to see what it is.",
+      "GraphIdea": "Flowchart showing region proposal followed by classification.",
+      "Example": "Used in security cameras to detect and identify people.",
+      "Content": "Faster R-CNN is a smart way to find objects in pictures. It first guesses where objects might be, then takes a closer look to figure out what they are. This helps in tasks like identifying people in security footage."
+    },
+    {
+      "Title": "Single-Stage Detection: YOLO",
+      "Equation": "",
+      "ImageIdea": "Grid over an image with detected objects highlighted.",
+      "ConceptExplanation": "YOLO looks at the whole picture once to find objects quickly.",
+      "DeepExplanation": "Imagine looking at a picture and instantly knowing where everything is. YOLO does this by dividing the image into a grid and checking each part for objects all at once.",
+      "GraphIdea": "Diagram showing image divided into grid cells with detected objects.",
+      "Example": "Used in real-time applications like drone navigation.",
+      "Content": "YOLO is like a super-fast detective that looks at the whole picture at once to find objects. It's great for things that need quick decisions, like drones flying around obstacles."
+    },
+    {
+      "Title": "Key Point-Based Detection: CenterNet",
+      "Equation": "",
+      "ImageIdea": "Image with key points marked on objects.",
+      "ConceptExplanation": "CenterNet finds the middle of objects to detect them.",
+      "DeepExplanation": "Instead of looking for the edges, CenterNet finds the center of objects. It's like finding the bullseye on a dartboard to know where the dart should go.",
+      "GraphIdea": "Diagram showing key points on objects with center marked.",
+      "Example": "Used in sports analytics to track players' positions.",
+      "Content": "CenterNet is a clever way to find objects by looking for their centers. This helps in tracking things like players on a field, making it useful for sports analysis."
+    }
+  ],
+  "Labs": [
+    {
+      "Title": "Lab 1: Understanding Object Detection with YOLO",
+      "Goal": "Learn how YOLO detects objects in images.",
+      "Dataset": {
+        "filename": "simple_objects.csv",
+        "description": "A small dataset with images of simple objects like balls and boxes."
+      },
+      "CodeFiles": [
+        {
+          "filename": "yolo_detection.py",
+          "description": "Python script to simulate YOLO object detection on the dataset."
+        }
+      ],
+      "RelationToSlides": [
+        "Single-Stage Detection: YOLO"
+      ]
+    },
+    {
+      "Title": "Lab 2: Exploring Two-Stage Detection with Faster R-CNN",
+      "Goal": "Understand the two-step process of Faster R-CNN.",
+      "Dataset": {
+        "filename": "street_scenes.csv",
+        "description": "Images of street scenes with labeled objects like cars and pedestrians."
+      },
+      "CodeFiles": [
+        {
+          "filename": "faster_rcnn_simulation.py",
+          "description": "Python script to demonstrate Faster R-CNN detection process."
+        }
+      ],
+      "RelationToSlides": [
+        "Two-Stage Detection: Faster R-CNN"
+      ]
+    },
+    {
+      "Title": "Lab 3: Key Point Detection with CenterNet",
+      "Goal": "Learn how CenterNet uses key points for object detection.",
+      "Dataset": {
+        "filename": "sports_players.csv",
+        "description": "Images of sports players with key points marked for detection."
+      },
+      "CodeFiles": [
+        {
+          "filename": "centernet_keypoints.py",
+          "description": "Python script to simulate key point detection using CenterNet."
+        }
+      ],
+      "RelationToSlides": [
+        "Key Point-Based Detection: CenterNet"
+      ]
+    }
+  ]
+}

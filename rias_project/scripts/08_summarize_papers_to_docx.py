@@ -72,12 +72,45 @@ class PaperSummarizer:
         return self.prompt_path.read_text(encoding="utf-8")
 
     def clean_raw(self, raw: str) -> str:
-        raw = raw.strip()
-        if raw.startswith("```"):
-            raw = raw.split("```", 1)[1].rsplit("```", 1)[0]
-        if raw.lower().startswith("json"):
-            raw = raw[4:].lstrip()
-        return raw.strip()
+        """Clean malformed JSON response from LLM."""
+        try:
+            # Basic string cleaning
+            raw = raw.strip()
+            
+            # If it's already valid JSON, return it
+            try:
+                json.loads(raw)
+                return raw
+            except:
+                pass
+
+            # Remove any markdown code block markers
+            raw = raw.replace("```json", "").replace("```", "")
+            
+            # Ensure it starts/ends with curly braces
+            if not raw.startswith("{"): raw = "{" + raw
+            if not raw.endswith("}"): raw = raw + "}"
+            
+            # Fix common JSON formatting issues
+            raw = raw.replace('""', '"')
+            raw = raw.replace('}"', '}')
+            raw = raw.replace('"{', '{')
+            raw = raw.replace('\n', ' ')
+            
+            # Add quotes around property names if missing
+            import re
+            raw = re.sub(r'([{,])\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*:', r'\1"\2":', raw)
+            
+            # If no SummaryDoc key exists, wrap the entire content
+            if '"SummaryDoc"' not in raw:
+                raw = raw.replace("{", '{"SummaryDoc":', 1)
+                
+            return raw
+            
+        except Exception as e:
+            print(f"Failed to clean JSON: {e}")
+            # Return a minimal valid JSON as fallback
+            return '{"SummaryDoc": "Error parsing LLM response"}'
 
     # ------------------------------------------------------------------
     # LLM call
@@ -198,48 +231,174 @@ class PaperSummarizer:
     # ------------------------------------------------------------------
     # Main runner
     # ------------------------------------------------------------------
-    def run(self):
-        print("\n=== Summarization with Images ===")
-
-        txt_files = sorted(self.txt_dir.glob("*.txt"))
-        if not txt_files:
-            print(f"No .txt files in {self.txt_dir}")
-            return
-
-        base_prompt = self.load_prompt()
-
-        combined = "\n\n".join(
-            f"--- FILE: {f.name} ---\n{self.truncate_text(f.read_text(encoding='utf-8'))}"
-            for f in txt_files
-        )
-
-        prompt = base_prompt.replace("<<<DOCUMENT_TEXT>>>", combined)
-        print(f"Calling LLM ({self.model}) …")
-
-        raw = self.call_llm(prompt)
-        if not raw:
-            print("⚠️ Empty response from LLM. Aborting.")
-            return
-
+    def run(self, pdf_stem: str):
+        """Main process to generate summary document."""
         try:
-            parsed = json.loads(raw)
-        except json.JSONDecodeError:
-            cleaned = self.clean_raw(raw)
+            print(f"\nProcessing {pdf_stem}")
+            
+            # Load and process text
+            txt_files = sorted(self.txt_dir.glob("*.txt"))
+            if not txt_files:
+                raise FileNotFoundError(f"No .txt files in {self.txt_dir}")
+                
+            combined = "\n\n".join(
+                f"--- FILE: {f.name} ---\n{f.read_text(encoding='utf-8')}"
+                for f in txt_files
+            )
+            
+            # Call LLM with retry on JSON error
+            prompt = self.load_prompt().replace("<<<DOCUMENT_TEXT>>>", combined)
+            raw = self.call_llm(prompt)
+            
+            if not raw:
+                raise ValueError("Empty response from LLM")
+                
+            # Parse response with fallback cleaning
             try:
-                parsed = json.loads(cleaned)
+                parsed = json.loads(raw)
             except json.JSONDecodeError:
-                print("❌ Final JSON decode failed. Dumping first 4000 chars:\n")
-                print(raw[:4000])
-                return
+                cleaned = self.clean_raw(raw)
+                try:
+                    parsed = json.loads(cleaned)
+                except json.JSONDecodeError as e:
+                    print(f"Failed to parse JSON even after cleaning: {e}")
+                    # Create minimal valid response
+                    parsed = {"SummaryDoc": raw}
+            
+            summary = parsed.get("SummaryDoc", "").strip()
+            if not summary:
+                raise ValueError("Empty summary document")
+                
+            # Create final DOCX
+            self.create_docx(summary)
+            return True
+            
+        except Exception as e:
+            print(f"ERROR in summarize: {e}")
+            return False
 
-        summary = parsed.get("SummaryDoc", "").strip()
-        if not summary:
-            print("⚠️ LLM returned empty SummaryDoc.")
-            return
+# ...existing code...
 
-        self.create_docx(summary)
-        print("\n✅ All done!")
-        print(f"🪵 Log saved at: {self.log_file}")
+# This function should REPLACE the old `def run(...)` 
+# at the end of your 'scripts/01_extract_text.py' file.
+
+# ------------------------------------------------------------------
+#     # Main runner
+#     # ------------------------------------------------------------------
+#     # ... (End of the PaperSummarizer class) ...
+
+
+# ---------------------------------------------------------------------
+# Bridge function for main.py
+# ---------------------------------------------------------------------
+
+def run(pdf_path, out_dir, prev=None):
+    """
+    Bridge used by main.py to run the PaperSummarizer.
+    """
+    try:
+        p = Path(pdf_path)
+        out = Path(out_dir)
+        pdf_stem = p.stem
+        
+        # Get base paths
+        result_dir = out.parent.parent  # Go up to the PDF's result folder
+        processed_dir = result_dir / "processed"
+        
+        # Input directories from previous pipeline steps
+        txt_dir = processed_dir / "01_extract_text_output"
+        images_dir = processed_dir / "06_extract_images_output"
+        
+        # Get project paths
+        SCRIPT_DIR = Path(__file__).resolve().parent.parent
+        prompt_path = SCRIPT_DIR / "prompts" / "[Prompt]summarize_papers.txt"
+        
+        # Output file path
+        output_docx = out / f"{pdf_stem}_Summary.docx"
+        
+        # Debug print paths
+        print(f"\nInput paths for {pdf_stem}:")
+        print(f"- Text dir: {txt_dir}")
+        print(f"- Images dir: {images_dir}")
+        print(f"- Output DOCX: {output_docx}")
+        
+        # Verify inputs exist
+        if not txt_dir.exists() or not any(txt_dir.glob("*.txt")):
+            raise FileNotFoundError(f"No text files found in: {txt_dir}")
+            
+        if not images_dir.exists():
+            print(f"Warning: Images directory not found: {images_dir}")
+        
+        # Initialize and run summarizer
+        summarizer = PaperSummarizer(
+            txt_dir=txt_dir,
+            images_dir=images_dir,
+            prompt_path=prompt_path,
+            output_path=output_docx,
+            model="gpt-4-turbo",
+            max_tokens=4096,
+            max_retries=3
+        )
+        
+        if summarizer.run(pdf_stem):
+            return {
+                "status": "success",
+                "files": [output_docx.name],
+                "summary": "Summary DOCX created."
+            }
+        else:
+            return {
+                "status": "error",
+                "error": "Failed to generate summary"
+            }
+            
+    except Exception as e:
+        print(f"ERROR in 08_summarize: {e}")
+        return {"status": "error", "error": str(e)}
+
+# ----------------------------------------------------------------------
+# Optional: CLI entry point (if you want to run this file directly)
+# ----------------------------------------------------------------------
+if __name__ == "__main__":
+    # This is just for testing this script directly
+    # You would need to manually set up the paths
+    
+    print("Running PaperSummarizer in standalone mode...")
+    
+    # --- Example paths for direct testing ---
+    # You MUST change these to match your test setup
+    
+    PDF_STEM = "test4" # The name of the PDF you want to process
+    
+    # Assumes your script is in 'rias_project/scripts/'
+    ROOT = Path(__file__).resolve().parent.parent 
+    
+    # MOCK PATHS from a pipeline run
+    MOCK_TXT_DIR = ROOT / "results/TEST_SESSION/test4/processed/01_extract_text_output"
+    MOCK_IMG_DIR = ROOT / "results/TEST_SESSION/test4/processed/06_extract_images_output"
+    MOCK_OUT_FILE = ROOT / "data/summarize_to_doc_output/Direct_Test_Summary.docx"
+    
+    MOCK_PROMPT = ROOT / "prompts" / "[Prompt]summarize_papers.txt"
+
+    # --- End Example Paths ---
+    
+    try:
+        summarizer = PaperSummarizer(
+            txt_dir=MOCK_TXT_DIR,
+            images_dir=MOCK_IMG_DIR,
+            prompt_path=MOCK_PROMPT,
+            output_path=MOCK_OUT_FILE,
+            model="gpt-4-turbo",
+            max_tokens=4096
+        )
+        
+        summarizer.run(pdf_stem=PDF_STEM)
+        
+    except Exception as e:
+        print(f"Error during standalone test: {e}")
+        import traceback
+        traceback.print_exc()
+# ----------------------------------------------------------------------
 # ---------------------------------------------------------------------
 #=============================================================
 # #!/usr/bin/env python

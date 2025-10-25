@@ -1,0 +1,81 @@
+{
+  "Slides": [
+    {
+      "Title": "What is Mean Average Precision (mAP)?",
+      "Equation": "mAP = \\frac{1}{n} \\sum_{i=1}^{n} AP_i",
+      "ImageIdea": "A bar chart showing precision at different recall levels for multiple classes.",
+      "ConceptExplanation": "mAP is a way to measure how well a model detects objects. It averages the precision across different classes.",
+      "DeepExplanation": "Imagine you have a basket of fruits and you want to see how well you can pick out apples, oranges, and bananas. mAP helps you see how good you are at picking each fruit and then gives you an overall score.",
+      "GraphIdea": "A line graph showing precision-recall curves for different object classes.",
+      "Example": "In the paper, mAP is used to evaluate how well the MapFusion framework detects cars, pedestrians, and other objects.",
+      "Content": "Mean Average Precision (mAP) is a key metric for evaluating object detection models. It calculates the average precision for each class and then averages these scores. In the context of the paper, mAP helps assess how well the MapFusion framework detects various objects like cars and pedestrians."
+    },
+    {
+      "Title": "Understanding Feature Aggregation",
+      "Equation": "F_{fused} = F_{voxel} \\oplus F_{map}",
+      "ImageIdea": "Diagram showing two feature maps being combined into one.",
+      "ConceptExplanation": "Feature aggregation is like mixing two sets of information to get a better understanding.",
+      "DeepExplanation": "Think of it like mixing two colors of paint to get a new color. By combining features from the map and the 3D point cloud, the model can see the environment more clearly.",
+      "GraphIdea": "A visual representation of feature maps before and after aggregation.",
+      "Example": "In MapFusion, features from HDMaps and LiDAR data are combined to improve object detection.",
+      "Content": "Feature aggregation in MapFusion involves combining features from HDMaps and LiDAR data. This process is like mixing two colors to create a new one, helping the model to better understand the environment and improve detection accuracy."
+    },
+    {
+      "Title": "The Role of MapSeg Module",
+      "Equation": "L_{seg} = -\\sum (y \\log(p) + (1-y) \\log(1-p))",
+      "ImageIdea": "Diagram showing input features being processed by the MapSeg module.",
+      "ConceptExplanation": "MapSeg helps the model learn about the road layout by predicting map segments.",
+      "DeepExplanation": "Imagine drawing a map of your neighborhood. MapSeg helps the model draw a map of the road layout, which improves its understanding of where objects are.",
+      "GraphIdea": "A comparison of segmentation maps with and without MapSeg.",
+      "Example": "MapSeg is used in the paper to predict road structures, aiding in better object detection.",
+      "Content": "The MapSeg module in MapFusion predicts road layouts from input features. It's like drawing a map of your neighborhood, helping the model understand where objects are located. This improves the model's ability to detect objects accurately."
+    }
+  ],
+  "Labs": [
+    {
+      "Title": "Calculating Mean Average Precision (mAP)",
+      "Goal": "Learn how to compute mAP for object detection results.",
+      "Dataset": {
+        "filename": "object_detection_results.csv",
+        "description": "A dataset containing predicted and actual classes for various objects."
+      },
+      "CodeFiles": [
+        {
+          "filename": "calculate_map.py",
+          "description": "Python script to calculate mAP from the dataset."
+        }
+      ],
+      "RelationToSlides": ["What is Mean Average Precision (mAP)?"]
+    },
+    {
+      "Title": "Visualizing Feature Aggregation",
+      "Goal": "Understand how feature aggregation improves detection.",
+      "Dataset": {
+        "filename": "feature_maps.npz",
+        "description": "Sample feature maps from LiDAR and HDMaps."
+      },
+      "CodeFiles": [
+        {
+          "filename": "visualize_aggregation.py",
+          "description": "Python script to visualize feature aggregation."
+        }
+      ],
+      "RelationToSlides": ["Understanding Feature Aggregation"]
+    },
+    {
+      "Title": "Exploring MapSeg Module",
+      "Goal": "Learn how the MapSeg module predicts road layouts.",
+      "Dataset": {
+        "filename": "road_layouts.npz",
+        "description": "Dataset containing input features and ground truth road layouts."
+      },
+      "CodeFiles": [
+        {
+          "filename": "mapseg_prediction.py",
+          "description": "Python script to explore MapSeg predictions."
+        }
+      ],
+      "RelationToSlides": ["The Role of MapSeg Module"]
+    }
+  ]
+}

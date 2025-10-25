@@ -274,6 +274,46 @@ class EducationalMaterialsGenerator:
         print("\nAll papers processed successfully!")
         print(f"Log file: {self.log_file}")
         return results
+    
+
+# ...existing code...
+
+# This function should REPLACE the old `def run(...)` 
+# at the end of your 'scripts/01_extract_text.py' file.
+
+def run(pdf_path, out_dir, prev=None):
+    """Bridge function for main.py pipeline."""
+    try:
+        p = Path(pdf_path)
+        out = Path(out_dir)
+        
+        # Get project root for paths
+        SCRIPT_DIR = Path(__file__).resolve().parent.parent
+        
+        # Create generator with script_dir
+        generator = EducationalMaterialsGenerator(
+            script_dir=SCRIPT_DIR,
+            txt_dir=f"data/extracted_text/{p.stem}",
+            prompt_path="prompts/[Prompt]explain_and_lab.txt",
+            output_dir=str(out)
+        )
+        
+        # Generate materials
+        results = generator.generate_all()
+        
+        # Return files created
+        files = [f.name for f in out.glob("*") if f.is_file()]
+        return {
+            "status": "success",
+            "files": files,
+            "summary": "materials generated"
+        }
+        
+    except Exception as e:
+        print(f"ERROR in generate_edu: {e}")
+        return {"status": "error", "error": str(e)}
+
+# ----------------------------------------------------------------------
 #------------------------------------------------------
 # # generate_edu_materials.py
 # import json

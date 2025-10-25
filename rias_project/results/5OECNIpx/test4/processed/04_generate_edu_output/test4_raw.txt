@@ -1,0 +1,81 @@
+{
+  "Slides": [
+    {
+      "Title": "What is Mean Average Precision (mAP)?",
+      "Equation": "mAP = \\frac{1}{n} \\sum_{i=1}^{n} AP_i",
+      "ImageIdea": "A bar chart showing different AP values for various object classes.",
+      "ConceptExplanation": "Mean Average Precision (mAP) is a way to measure how well a model detects objects.",
+      "DeepExplanation": "Imagine you have a list of objects to find, like cars and bikes. mAP tells you how good you are at finding all of them, on average.",
+      "GraphIdea": "A line graph showing mAP improvement over different models.",
+      "Example": "In the paper, mAP improved by 1.27 to 2.79 points using MapFusion.",
+      "Content": "Mean Average Precision (mAP) is a key metric for evaluating object detection models. It averages the precision of detecting different objects, like cars and pedestrians. In this study, using MapFusion improved mAP by up to 2.79 points, showing better detection performance."
+    },
+    {
+      "Title": "Understanding Precision in Object Detection",
+      "Equation": "Precision = \\frac{TP}{TP + FP}",
+      "ImageIdea": "Two circles showing overlap between true and predicted objects.",
+      "ConceptExplanation": "Precision measures how many of the detected objects are actually correct.",
+      "DeepExplanation": "Think of precision like a test score. If you answer 8 out of 10 questions correctly, your precision is 80%.",
+      "GraphIdea": "A bar graph comparing precision before and after using MapFusion.",
+      "Example": "MapFusion helped reduce false positives, improving precision.",
+      "Content": "Precision is about accuracy in detection. It calculates the ratio of correctly identified objects to all identified objects. By using MapFusion, the precision improved, meaning fewer false alarms in detecting objects like cars and pedestrians."
+    },
+    {
+      "Title": "The Role of HDMaps in 3D Object Detection",
+      "Equation": "FusedFeatures = VoxelFeatures + MapFeatures",
+      "ImageIdea": "Diagram showing fusion of map and voxel features.",
+      "ConceptExplanation": "HDMaps provide detailed road information that helps in better object detection.",
+      "DeepExplanation": "Imagine having a detailed map while playing a treasure hunt. It helps you find treasures (objects) more accurately.",
+      "GraphIdea": "A comparison chart showing detection accuracy with and without HDMaps.",
+      "Example": "Using HDMaps in MapFusion improved detection accuracy by providing more context.",
+      "Content": "HDMaps are like super-detailed maps that help in detecting objects more accurately. By combining map features with voxel features, MapFusion enhances the detection process, reducing errors and improving accuracy."
+    }
+  ],
+  "Labs": [
+    {
+      "Title": "Calculating Mean Average Precision (mAP)",
+      "Goal": "Learn to compute mAP for a set of detected objects.",
+      "Dataset": {
+        "filename": "object_detection_results.csv",
+        "description": "Contains predicted and actual labels for various objects."
+      },
+      "CodeFiles": [
+        {
+          "filename": "calculate_map.py",
+          "description": "Python script to calculate mAP from detection results."
+        }
+      ],
+      "RelationToSlides": ["What is Mean Average Precision (mAP)?"]
+    },
+    {
+      "Title": "Improving Precision with MapFusion",
+      "Goal": "Visualize how MapFusion improves precision in object detection.",
+      "Dataset": {
+        "filename": "detection_comparison.csv",
+        "description": "Comparison of detection results with and without MapFusion."
+      },
+      "CodeFiles": [
+        {
+          "filename": "precision_visualization.py",
+          "description": "Python script to plot precision improvements using MapFusion."
+        }
+      ],
+      "RelationToSlides": ["Understanding Precision in Object Detection"]
+    },
+    {
+      "Title": "Exploring HDMaps for Better Detection",
+      "Goal": "Understand the impact of HDMaps on detection accuracy.",
+      "Dataset": {
+        "filename": "hdmap_features.csv",
+        "description": "Features extracted from HDMaps for object detection."
+      },
+      "CodeFiles": [
+        {
+          "filename": "hdmap_integration.py",
+          "description": "Python script to simulate HDMap feature integration."
+        }
+      ],
+      "RelationToSlides": ["The Role of HDMaps in 3D Object Detection"]
+    }
+  ]
+}

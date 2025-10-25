@@ -1,0 +1,81 @@
+{
+  "Slides": [
+    {
+      "Title": "What is Mean Average Precision (mAP)?",
+      "Equation": "mAP = \\frac{1}{n} \\sum_{i=1}^{n} AP_i",
+      "ImageIdea": "A bar chart showing different AP values for various object classes.",
+      "ConceptExplanation": "Mean Average Precision (mAP) is a way to measure how well a model detects objects.",
+      "DeepExplanation": "Imagine you have a list of objects you need to find, like cars and bikes. mAP tells you how good you are at finding all of them correctly.",
+      "GraphIdea": "A line graph showing mAP improvement over different models.",
+      "Example": "In the paper, mAP improved by 1.27 to 2.79 points using MapFusion.",
+      "Content": "Mean Average Precision (mAP) is a key metric for evaluating object detection models. It averages the precision of detecting different objects, like cars and pedestrians. In this study, using MapFusion improved mAP by up to 2.79 points, showing better detection performance."
+    },
+    {
+      "Title": "Understanding Cross Entropy Loss",
+      "Equation": "L = -\\frac{1}{N} \\sum_{i=1}^{N} [y_i \\log(p_i) + (1-y_i) \\log(1-p_i)]",
+      "ImageIdea": "A simple diagram showing predicted vs actual outcomes.",
+      "ConceptExplanation": "Cross Entropy Loss measures how well the predicted probabilities match the actual outcomes.",
+      "DeepExplanation": "Think of it like a game where you guess the outcome of a coin flip. Cross Entropy Loss tells you how far off your guesses are from the actual flips.",
+      "GraphIdea": "A curve showing loss decreasing over training epochs.",
+      "Example": "In the MapSeg module, Cross Entropy Loss helps improve map segmentation accuracy.",
+      "Content": "Cross Entropy Loss is used to measure the difference between predicted probabilities and actual outcomes. It's like checking how close your guesses are to the real answers. In the MapSeg module, this loss helps improve the accuracy of predicting road maps."
+    },
+    {
+      "Title": "The Role of HDMaps in 3D Object Detection",
+      "Equation": "FusedFeatures = VoxelFeatures \\oplus MapFeatures",
+      "ImageIdea": "A diagram showing the fusion of map and voxel features.",
+      "ConceptExplanation": "HDMaps provide detailed road information that helps in better object detection.",
+      "DeepExplanation": "Imagine having a super-detailed map that shows every lane and sign. This map helps the car's sensors understand the environment better.",
+      "GraphIdea": "A comparison chart showing detection accuracy with and without HDMaps.",
+      "Example": "MapFusion uses HDMaps to improve detection accuracy by reducing false positives.",
+      "Content": "HDMaps contain detailed road information, like lanes and signs, which help improve 3D object detection. By fusing these maps with sensor data, MapFusion reduces false positives, making detection more accurate."
+    }
+  ],
+  "Labs": [
+    {
+      "Title": "Calculating Mean Average Precision (mAP)",
+      "Goal": "Learn how to compute mAP for object detection models.",
+      "Dataset": {
+        "filename": "object_detection_results.csv",
+        "description": "A CSV file containing predicted and actual labels for various objects."
+      },
+      "CodeFiles": [
+        {
+          "filename": "calculate_map.py",
+          "description": "Python script to calculate mAP from detection results."
+        }
+      ],
+      "RelationToSlides": ["What is Mean Average Precision (mAP)?"]
+    },
+    {
+      "Title": "Exploring Cross Entropy Loss",
+      "Goal": "Understand and visualize how Cross Entropy Loss works.",
+      "Dataset": {
+        "filename": "predictions_vs_actuals.csv",
+        "description": "A CSV file with predicted probabilities and actual outcomes."
+      },
+      "CodeFiles": [
+        {
+          "filename": "cross_entropy_loss.py",
+          "description": "Python script to compute and plot Cross Entropy Loss."
+        }
+      ],
+      "RelationToSlides": ["Understanding Cross Entropy Loss"]
+    },
+    {
+      "Title": "HDMaps and Feature Fusion",
+      "Goal": "Visualize the impact of HDMaps on 3D object detection.",
+      "Dataset": {
+        "filename": "hdmap_features.csv",
+        "description": "A CSV file containing HDMap and voxel features."
+      },
+      "CodeFiles": [
+        {
+          "filename": "feature_fusion.py",
+          "description": "Python script to simulate feature fusion and visualize results."
+        }
+      ],
+      "RelationToSlides": ["The Role of HDMaps in 3D Object Detection"]
+    }
+  ]
+}

@@ -105,13 +105,45 @@ class PDFTextExtractor:
     # ------------------------------------------------------------------
     # Helper: run everything at once
     # ------------------------------------------------------------------
-    def run(
-        self,
-        pdf_names: Optional[Union[str, Iterable[str]]] = None,
-        pattern: Optional[str] = None
-    ):
-        """Convenience method to execute the pipeline."""
-        self.process_pdfs(pdf_names=pdf_names, pattern=pattern)
+    # This function should REPLACE the old `def run(...)` 
+# at the end of your 'scripts/01_extract_text.py' file.
+
+def run(pdf_path, out_dir, prev=None):
+    """
+    Bridge used by main.py.
+    Instantiates PDFTextExtractor and calls its method.
+    Returns a dict: {'status','files','summary'}.
+    """
+    try:
+        p = Path(pdf_path)
+        out = Path(out_dir)
+
+        # 1. Instantiate your class.
+        # We pass the parent dirs to satisfy the __init__ requirements.
+        extractor = PDFTextExtractor(input_dir=p.parent, output_dir=out.parent)
+        
+        # 2. Call the specific class method that processes one file.
+        # The `out_dir` from main.py is the `pdf_out_dir` this method expects.
+        extractor.extract_text_from_pdf(pdf_path=p, pdf_out_dir=out)
+        
+        # 3. Check for the output file and return the result dict
+        expected_file = out / f"{p.stem}.txt"
+        if not expected_file.exists():
+             raise FileNotFoundError(f"Output file not created: {expected_file}")
+
+        return {
+            "status": "success",
+            "files": [expected_file.name],
+            "summary": "text extracted"
+        }
+
+    except Exception as e:
+        import traceback
+        print(f"ERROR in 01_extract_text: {e}")
+        traceback.print_exc() # Print full error for debugging
+        return {"status": "error", "error": str(e)}
+
+# ----------------------------------------------------------------------
 
 
 # ----------------------------------------------------------------------
@@ -130,6 +162,7 @@ if __name__ == "__main__":
     extractor = PDFTextExtractor(args.input_dir, args.output_dir)
     pdf_names = None if not args.pdfs or args.pdfs == ["all"] else args.pdfs
     extractor.run(pdf_names=pdf_names, pattern=args.pattern)
+
 
 # ----------------------------------------------------------------------
 # import fitz  # PyMuPDF
@@ -291,3 +324,4 @@ if __name__ == "__main__":
 #         output_dir=SCRIPT_DIR / "data/extracted_text",
 #         pattern="rias_project\data/raw_pdfs/test4.pdf"  # Just use the filename instead of full path
 #     )
+

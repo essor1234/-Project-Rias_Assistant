@@ -1,0 +1,33 @@
+
+📄 Processing test4.txt
+✅ 5 suggestions found for test4.txt
+
+💾 Suggested papers saved to: D:\[Project]Rias_Assistant\rias_project\results\DBDzn1Wz\test4\processed\07_suggest_next_output\test4_suggestions.xlsx
+  07 | Suggest Next       → SUCCESS  suggestions generated  [test4_suggestions.xlsx]
+Found 22 images in D:\[Project]Rias_Assistant\rias_project\results\DBDzn1Wz\test4\processed\06_extract_images_output
+Inserted image: page1_img1.jpg
+Image NOT FOUND: page2_img1.jpg
+💾 DOCX saved → D:\[Project]Rias_Assistant\rias_project\results\DBDzn1Wz\test4\processed\08_summarize_output\test4_Summary.docx
+  08 | Summarize          → SUCCESS  Summary DOCX created.  [test4_Summary.docx]
+
+======================================================================
+PIPELINE FINISHED @ 2025-10-26 04:30:51
+SESSION ID: DBDzn1Wz
+ALL RESULTS IN: results/DBDzn1Wz
+======================================================================
+
+test4
+  STAGE 1: [01, 06]
+    01 Extract Text       → SUCCESS  text extracted  [test4.txt]
+    06 Extract Images     → SUCCESS  images extracted  [page1_img1.jpg, page1_img2.jpg, page2_img1.jpeg, page2_img2.jpeg, page3_img1.jpg, page3_img2.jpg, page3_img3.jpg, page3_img4.jpg, page3_img5.jpg, page4_img1.jpg, page4_img2.jpg, page4_img3.jpg, page4_img4.jpeg, page4_img5.jpeg, page4_img6.jpeg, page6_img1.jpg, page6_img2.jpeg, page6_img3.jpeg, page6_img4.jpeg, page6_img5.jpg, page6_img6.jpg, page6_img7.jpg]
+  STAGE 2: [03, 04]
+    03 Compare Papers     → SUCCESS  comparison generated  [test4_comparison.xlsx]
+    04 Generate Edu       → SUCCESS  materials generated  [lab_test4.zip, slides_test4.pptx, slides_test4.raw.json, test4_raw.txt]
+  STAGE 3: [08, 07]
+    08 Summarize          → SUCCESS  Summary DOCX created.  [test4_Summary.docx]
+    07 Suggest Next       → SUCCESS  suggestions generated  [test4_suggestions.xlsx]
+
+All outputs saved in:
+  results/DBDzn1Wz
+
+======================================================================

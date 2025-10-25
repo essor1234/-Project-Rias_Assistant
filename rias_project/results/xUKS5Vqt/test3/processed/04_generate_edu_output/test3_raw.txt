@@ -1,0 +1,101 @@
+{
+  "Slides": [
+    {
+      "Title": "What is Object Detection?",
+      "Equation": "",
+      "ImageIdea": "A scene with various objects like cars, people, and signs, each with a box around them.",
+      "ConceptExplanation": "Object detection is about finding and identifying objects in pictures.",
+      "DeepExplanation": "Imagine you have a picture of a busy street. Object detection helps a computer find and name things like cars, people, and traffic lights in that picture.",
+      "GraphIdea": "A simple diagram showing input image and output with labeled boxes.",
+      "Example": "Detecting cars and pedestrians in a street scene for autonomous driving.",
+      "Content": "Object detection helps computers see and understand what's in a picture. It's like when you look at a photo and can point out a car, a person, or a tree. This is important for things like self-driving cars, which need to know what's around them to drive safely."
+    },
+    {
+      "Title": "Two-Stage Detection: Faster R-CNN",
+      "Equation": "",
+      "ImageIdea": "Two-step process diagram: first finding regions, then classifying them.",
+      "ConceptExplanation": "Two-stage detection first finds possible object areas, then checks what they are.",
+      "DeepExplanation": "Think of it like a treasure hunt: first, you look for places where treasure might be hidden, then you check each spot to see if there's actually treasure there.",
+      "GraphIdea": "Flowchart showing region proposal followed by classification.",
+      "Example": "Faster R-CNN is used in security cameras to detect intruders.",
+      "Content": "Two-stage detection methods like Faster R-CNN work by first finding areas in an image that might contain objects. Then, they take a closer look at these areas to figure out exactly what the objects are. This method is very accurate, which is why it's used in things like security systems."
+    },
+    {
+      "Title": "Single-Stage Detection: YOLO",
+      "Equation": "",
+      "ImageIdea": "Grid over an image with detected objects highlighted.",
+      "ConceptExplanation": "Single-stage detection finds and identifies objects in one go.",
+      "DeepExplanation": "Imagine you have a magic camera that can instantly tell you everything in a picture as soon as you take it. That's what YOLO does with images.",
+      "GraphIdea": "Comparison of detection speed between YOLO and two-stage methods.",
+      "Example": "YOLO is used in real-time applications like drones to avoid obstacles.",
+      "Content": "Single-stage detection methods like YOLO are super fast because they look at the whole image at once to find and identify objects. This makes them perfect for real-time applications, like drones that need to quickly spot and avoid obstacles."
+    },
+    {
+      "Title": "Key Point-Based Detection: CenterNet",
+      "Equation": "",
+      "ImageIdea": "Diagram showing key points on objects like corners and centers.",
+      "ConceptExplanation": "Key point-based detection uses important points to find objects.",
+      "DeepExplanation": "Think of it like connecting the dots: you find key points on an object, like the corners, and use them to draw a box around it.",
+      "GraphIdea": "Illustration of key points on various objects in an image.",
+      "Example": "CenterNet is used in sports to track players by their key points.",
+      "Content": "Key point-based detection methods like CenterNet find important points on objects, such as corners or centers, to help locate and identify them. This method is useful for tracking things like players in a sports game, where you need to know exactly where each player is."
+    },
+    {
+      "Title": "Understanding IoU (Intersection over Union)",
+      "Equation": "IoU = \\frac{Area\\ of\\ Overlap}{Area\\ of\\ Union}",
+      "ImageIdea": "Two overlapping rectangles showing the intersection and union areas.",
+      "ConceptExplanation": "IoU measures how well two shapes overlap.",
+      "DeepExplanation": "Imagine you have two pieces of paper. IoU tells you how much they overlap when you put one on top of the other.",
+      "GraphIdea": "Bar graph showing IoU values for different object detections.",
+      "Example": "Used in evaluating how well a model detects objects compared to the true positions.",
+      "Content": "IoU, or Intersection over Union, is a way to measure how well two shapes overlap. It's used in object detection to see how closely the detected object matches the actual object. A higher IoU means a better match!"
+    }
+  ],
+  "Labs": [
+    {
+      "Title": "Lab 1: Calculating IoU",
+      "Goal": "Learn how to calculate Intersection over Union for object detection.",
+      "Dataset": {
+        "filename": "object_positions.csv",
+        "description": "Contains true and predicted positions of objects in images."
+      },
+      "CodeFiles": [
+        {
+          "filename": "calculate_iou.py",
+          "description": "Python script to calculate IoU for given object positions."
+        }
+      ],
+      "RelationToSlides": ["Understanding IoU (Intersection over Union)"]
+    },
+    {
+      "Title": "Lab 2: Exploring Two-Stage Detection",
+      "Goal": "Understand the process of two-stage object detection using Faster R-CNN.",
+      "Dataset": {
+        "filename": "image_samples.zip",
+        "description": "Sample images for practicing two-stage detection."
+      },
+      "CodeFiles": [
+        {
+          "filename": "two_stage_detection.py",
+          "description": "Python script simulating two-stage detection process."
+        }
+      ],
+      "RelationToSlides": ["Two-Stage Detection: Faster R-CNN"]
+    },
+    {
+      "Title": "Lab 3: Real-Time Detection with YOLO",
+      "Goal": "Implement a simple real-time object detection using YOLO.",
+      "Dataset": {
+        "filename": "video_samples.zip",
+        "description": "Sample video clips for real-time detection practice."
+      },
+      "CodeFiles": [
+        {
+          "filename": "yolo_detection.py",
+          "description": "Python script for real-time object detection using YOLO."
+        }
+      ],
+      "RelationToSlides": ["Single-Stage Detection: YOLO"]
+    }
+  ]
+}

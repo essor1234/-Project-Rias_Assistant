@@ -1,0 +1,91 @@
+{
+  "Slides": [
+    {
+      "Title": "What is Object Detection?",
+      "Equation": "",
+      "ImageIdea": "Image of a car with boxes around detected objects like pedestrians and traffic signs.",
+      "ConceptExplanation": "Object detection is about finding and identifying objects in pictures.",
+      "DeepExplanation": "Imagine you are playing a game where you have to spot all the cars and people in a picture. Object detection helps computers do this automatically.",
+      "GraphIdea": "Bar chart showing detection accuracy of different methods.",
+      "Example": "Detecting cars and pedestrians for self-driving cars.",
+      "Content": "Object detection helps computers find and identify objects in images, like cars and people. It's like a game where you spot things, but the computer does it automatically. This is important for things like self-driving cars to see what's around them."
+    },
+    {
+      "Title": "Two-Stage Detection: Faster R-CNN",
+      "Equation": "",
+      "ImageIdea": "Diagram showing two stages: region proposal and classification.",
+      "ConceptExplanation": "Two-stage detection first finds possible object areas, then checks what they are.",
+      "DeepExplanation": "Think of it like a treasure hunt: first, you find places where treasure might be hidden, then you check each spot to see if there's treasure.",
+      "GraphIdea": "Flowchart of the two-stage process.",
+      "Example": "Used in security cameras to detect intruders.",
+      "Content": "Two-stage detection, like Faster R-CNN, works by first finding areas where objects might be, then checking each area to see what the object is. It's like a treasure hunt where you first find possible spots and then check each one."
+    },
+    {
+      "Title": "Single-Stage Detection: YOLO",
+      "Equation": "",
+      "ImageIdea": "Grid over an image showing detected objects.",
+      "ConceptExplanation": "Single-stage detection finds and identifies objects in one go.",
+      "DeepExplanation": "Imagine you have a magic camera that can instantly tell you what objects are in a picture without needing to look twice.",
+      "GraphIdea": "Speed comparison chart between YOLO and two-stage methods.",
+      "Example": "Used in real-time applications like drones.",
+      "Content": "Single-stage detection, like YOLO, finds and identifies objects in one step. It's like having a magic camera that instantly tells you what's in a picture. This is great for fast tasks like flying drones."
+    },
+    {
+      "Title": "Key Point-Based Detection: CenterNet",
+      "Equation": "",
+      "ImageIdea": "Image showing key points on objects like corners and centers.",
+      "ConceptExplanation": "Key point-based detection uses important points to find objects.",
+      "DeepExplanation": "Think of it like connecting the dots: you find key points on an object and connect them to see the whole shape.",
+      "GraphIdea": "Diagram showing key points and bounding boxes.",
+      "Example": "Used in sports to track players' movements.",
+      "Content": "Key point-based detection, like CenterNet, uses important points on objects to find them. It's like connecting the dots to see the whole shape. This method is useful in sports to track players' movements."
+    }
+  ],
+  "Labs": [
+    {
+      "Title": "Lab 1: Understanding Object Detection",
+      "Goal": "Learn how to identify objects in images using basic detection techniques.",
+      "Dataset": {
+        "filename": "simple_objects.csv",
+        "description": "A small dataset of images with labeled objects like cars and people."
+      },
+      "CodeFiles": [
+        {
+          "filename": "object_detection_basics.py",
+          "description": "Python script to load images and apply basic object detection."
+        }
+      ],
+      "RelationToSlides": ["What is Object Detection?", "Two-Stage Detection: Faster R-CNN"]
+    },
+    {
+      "Title": "Lab 2: Speed vs. Accuracy in Detection",
+      "Goal": "Compare the speed and accuracy of different detection methods.",
+      "Dataset": {
+        "filename": "detection_speed_accuracy.csv",
+        "description": "Dataset with images and detection results from different methods."
+      },
+      "CodeFiles": [
+        {
+          "filename": "compare_detection_methods.py",
+          "description": "Python script to compare detection speed and accuracy."
+        }
+      ],
+      "RelationToSlides": ["Single-Stage Detection: YOLO", "Two-Stage Detection: Faster R-CNN"]
+    },
+    {
+      "Title": "Lab 3: Key Point Detection",
+      "Goal": "Explore how key points are used to detect objects.",
+      "Dataset": {
+        "filename": "key_points.csv",
+        "description": "Dataset with images and key points for object detection."
+      },
+      "CodeFiles": [
+        {
+          "filename": "key_point_detection.py",
+          "description": "Python script to visualize and use key points for detection."
+        }
+      ],
+      "RelationToSlides": ["Key Point-Based Detection: CenterNet"]
+    }
+  ]
+}

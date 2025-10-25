@@ -1,0 +1,110 @@
+{
+  "Slides": [
+    {
+      "Title": "What is Object Detection?",
+      "Equation": "",
+      "ImageIdea": "A scene with various objects like cars, people, and signs, each with a box around them.",
+      "ConceptExplanation": "Object detection is about finding and identifying objects in pictures.",
+      "DeepExplanation": "Imagine you have a picture of a busy street. Object detection helps a computer see and label things like cars, people, and traffic lights.",
+      "GraphIdea": "A simple image with labeled objects and bounding boxes.",
+      "Example": "Detecting cars and pedestrians in a street scene for autonomous driving.",
+      "Content": "Object detection is like teaching a computer to see and understand what's in a picture. It helps identify and locate objects like cars and people, which is crucial for things like self-driving cars."
+    },
+    {
+      "Title": "Two-Stage Detection: Faster R-CNN",
+      "Equation": "",
+      "ImageIdea": "Diagram showing two stages: region proposal and classification.",
+      "ConceptExplanation": "Two-stage detection first finds possible object areas, then identifies them.",
+      "DeepExplanation": "Think of it like a treasure hunt: first, you find possible spots where treasure might be, then you check each spot to see if there's actually treasure there.",
+      "GraphIdea": "Flowchart of the two-stage process.",
+      "Example": "Faster R-CNN is used in security cameras to detect intruders.",
+      "Content": "Two-stage detection methods like Faster R-CNN first look for areas where objects might be, then check those areas to see what the objects are. This helps in accurately finding and identifying objects."
+    },
+    {
+      "Title": "Single-Stage Detection: YOLO",
+      "Equation": "",
+      "ImageIdea": "Grid over an image with detected objects.",
+      "ConceptExplanation": "Single-stage detection finds and identifies objects in one go.",
+      "DeepExplanation": "Imagine looking at a picture and instantly knowing where all the objects are, like a superhero with super sight!",
+      "GraphIdea": "Comparison of detection speed between YOLO and two-stage methods.",
+      "Example": "YOLO is used in real-time applications like drones to quickly detect objects.",
+      "Content": "Single-stage detection methods like YOLO are super fast because they find and identify objects in one step. This makes them great for real-time tasks like flying drones."
+    },
+    {
+      "Title": "Key Point-Based Detection: CenterNet",
+      "Equation": "",
+      "ImageIdea": "Image with key points marked on objects.",
+      "ConceptExplanation": "Key point-based detection uses important points to find objects.",
+      "DeepExplanation": "It's like connecting the dots: you find key points on an object and use them to figure out what and where the object is.",
+      "GraphIdea": "Diagram showing key points on an object and how they form a bounding box.",
+      "Example": "CenterNet is used in sports to track players by detecting key points on their bodies.",
+      "Content": "Key point-based detection methods like CenterNet use important points on objects to find and identify them. This is useful for tracking things like players in a sports game."
+    },
+    {
+      "Title": "Transformer-Based Detection",
+      "Equation": "",
+      "ImageIdea": "Diagram showing attention mechanism in a transformer model.",
+      "ConceptExplanation": "Transformers use attention to focus on important parts of data.",
+      "DeepExplanation": "Imagine reading a book and highlighting the important parts. Transformers do something similar with data to understand it better.",
+      "GraphIdea": "Visualization of attention weights in a transformer model.",
+      "Example": "Transformers are used in advanced object detection systems to improve accuracy.",
+      "Content": "Transformer-based detection methods use attention to focus on important parts of an image, helping to improve the accuracy of object detection. This is like highlighting key parts of a book to understand it better."
+    }
+  ],
+  "Labs": [
+    {
+      "Title": "Lab 1: Understanding Precision and Recall",
+      "Goal": "Learn how to calculate precision and recall for object detection.",
+      "Dataset": {
+        "filename": "object_detection_results.csv",
+        "description": "A small dataset with predicted and actual object labels and locations."
+      },
+      "CodeFiles": [
+        {
+          "filename": "precision_recall_calculation.py",
+          "description": "Python script to calculate precision and recall from the dataset."
+        }
+      ],
+      "RelationToSlides": [
+        "What is Object Detection?",
+        "Two-Stage Detection: Faster R-CNN"
+      ]
+    },
+    {
+      "Title": "Lab 2: Visualizing Detection Results",
+      "Goal": "Create visualizations of object detection results using bounding boxes.",
+      "Dataset": {
+        "filename": "detection_images.zip",
+        "description": "A set of images with detected objects and their bounding boxes."
+      },
+      "CodeFiles": [
+        {
+          "filename": "visualize_detections.py",
+          "description": "Python script to draw bounding boxes on images and display them."
+        }
+      ],
+      "RelationToSlides": [
+        "Single-Stage Detection: YOLO",
+        "Key Point-Based Detection: CenterNet"
+      ]
+    },
+    {
+      "Title": "Lab 3: Analyzing Model Performance",
+      "Goal": "Compare the performance of different object detection models.",
+      "Dataset": {
+        "filename": "model_performance.csv",
+        "description": "Performance metrics for different object detection models."
+      },
+      "CodeFiles": [
+        {
+          "filename": "performance_analysis.py",
+          "description": "Python script to analyze and compare model performance metrics."
+        }
+      ],
+      "RelationToSlides": [
+        "Transformer-Based Detection",
+        "What is Object Detection?"
+      ]
+    }
+  ]
+}

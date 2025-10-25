@@ -1,0 +1,87 @@
+{
+  "Slides": [
+    {
+      "Title": "What is Mean Average Precision (mAP)?",
+      "Equation": "mAP = \\frac{1}{n} \\sum_{i=1}^{n} AP_i",
+      "ImageIdea": "A bar chart showing different AP values for various object classes.",
+      "ConceptExplanation": "Mean Average Precision (mAP) is a way to measure how well a model detects objects.",
+      "DeepExplanation": "Imagine you have a test with many questions, and you want to know your average score. mAP is like finding the average score for detecting different objects, like cars and pedestrians.",
+      "GraphIdea": "A line graph showing mAP improvement over different models.",
+      "Example": "In the paper, mAP improved by 1.27 to 2.79 points when using MapFusion.",
+      "Content": "Mean Average Precision (mAP) helps us understand how good a model is at finding objects. It's like averaging your scores across different subjects in school. In this study, using MapFusion improved mAP, showing better object detection."
+    },
+    {
+      "Title": "Understanding False Positives and False Negatives",
+      "Equation": "Precision = \\frac{TP}{TP + FP}, \\quad Recall = \\frac{TP}{TP + FN}",
+      "ImageIdea": "Two circles showing overlap between true and predicted objects, highlighting false positives and negatives.",
+      "ConceptExplanation": "False positives are when the model thinks something is there, but it's not. False negatives are when the model misses something that is there.",
+      "DeepExplanation": "Think of false positives like thinking you have more candies than you actually do, and false negatives like missing candies that are actually in your bag.",
+      "GraphIdea": "A confusion matrix showing true positives, false positives, and false negatives.",
+      "Example": "The paper shows that MapFusion reduces false positives in 3D object detection.",
+      "Content": "False positives and negatives are mistakes a model can make. Reducing these errors means the model is better at detecting objects. MapFusion helps reduce false positives, making the detection more accurate."
+    },
+    {
+      "Title": "The Role of HDMaps in 3D Object Detection",
+      "Equation": "FusedFeatures = VoxelFeatures \\oplus MapFeatures",
+      "ImageIdea": "Diagram showing fusion of map features with voxel features.",
+      "ConceptExplanation": "HDMaps provide detailed information about roads and surroundings, helping models detect objects better.",
+      "DeepExplanation": "Imagine having a super-detailed map that shows every road and sign. This helps the model know where objects are likely to be.",
+      "GraphIdea": "A comparison chart showing detection accuracy with and without HDMaps.",
+      "Example": "MapFusion uses HDMaps to improve detection accuracy by providing more context.",
+      "Content": "HDMaps are like super-detailed maps that help models understand the environment better. By using HDMaps, MapFusion improves the accuracy of detecting objects, making it easier for the model to know where things are."
+    }
+  ],
+  "Labs": [
+    {
+      "Title": "Lab 1: Calculating Mean Average Precision (mAP)",
+      "Goal": "Learn how to calculate mAP for a set of object detection results.",
+      "Dataset": {
+        "filename": "detection_results.csv",
+        "description": "A CSV file containing predicted and actual labels for various objects."
+      },
+      "CodeFiles": [
+        {
+          "filename": "calculate_map.py",
+          "description": "Python script to calculate mAP from detection results."
+        }
+      ],
+      "RelationToSlides": [
+        "What is Mean Average Precision (mAP)?"
+      ]
+    },
+    {
+      "Title": "Lab 2: Visualizing False Positives and Negatives",
+      "Goal": "Understand and visualize false positives and negatives in object detection.",
+      "Dataset": {
+        "filename": "detection_errors.csv",
+        "description": "A CSV file with detection results highlighting false positives and negatives."
+      },
+      "CodeFiles": [
+        {
+          "filename": "visualize_errors.py",
+          "description": "Python script to visualize false positives and negatives."
+        }
+      ],
+      "RelationToSlides": [
+        "Understanding False Positives and False Negatives"
+      ]
+    },
+    {
+      "Title": "Lab 3: Exploring the Impact of HDMaps",
+      "Goal": "Analyze how HDMaps improve 3D object detection accuracy.",
+      "Dataset": {
+        "filename": "hdmap_features.csv",
+        "description": "A CSV file containing features extracted from HDMaps."
+      },
+      "CodeFiles": [
+        {
+          "filename": "hdmap_analysis.py",
+          "description": "Python script to analyze the impact of HDMaps on detection accuracy."
+        }
+      ],
+      "RelationToSlides": [
+        "The Role of HDMaps in 3D Object Detection"
+      ]
+    }
+  ]
+}

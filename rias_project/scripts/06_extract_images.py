@@ -1,4 +1,3 @@
-
 import os
 from pathlib import Path
 from typing import Union, Iterable, Optional
@@ -31,9 +30,12 @@ class PDFImageExtractor:
     # ------------------------------------------------------------------
     def process_single_pdf(self, pdf_path: Path, zoom: int = 4) -> None:
         """Extract images and render pages from a single PDF."""
-        pdf_stem = pdf_path.stem
-        pdf_out_dir = self.output_dir / pdf_stem
-        pdf_out_dir.mkdir(exist_ok=True)
+        
+        # ▼▼▼ THIS IS THE FIX ▼▼▼
+        # The 'main.py' script already provides the final, correct output dir.
+        # We should save images directly into it, not in a new subfolder.
+        pdf_out_dir = self.output_dir
+        # ▲▲▲ END OF FIX ▲▲▲
 
         print(f"Processing {pdf_path.name} → {pdf_out_dir.name}/")
 
@@ -97,15 +99,38 @@ class PDFImageExtractor:
     # ------------------------------------------------------------------
     # Helper: run entire pipeline
     # ------------------------------------------------------------------
-    def run(
-        self,
-        pdf_names: Optional[Union[str, Iterable[str]]] = None,
-        pattern: Optional[str] = None,
-        zoom: int = 4
-    ):
-        """Convenience wrapper to run full pipeline."""
-        self.process_pdfs(pdf_names=pdf_names, pattern=pattern, zoom=zoom)
+    # This function should REPLACE the old `def run(...)` 
+# at the end of your 'scripts/01_extract_text.py' file.
 
+def run(pdf_path, out_dir, prev=None):
+    """Bridge function for main.py pipeline."""
+    try:
+        p = Path(pdf_path)
+        out = Path(out_dir)
+        
+        # Create extractor with correct paths
+        extractor = PDFImageExtractor(
+            input_dir=p.parent,  
+            output_dir=out
+        )
+        
+        # Process just this single PDF
+        extractor.process_single_pdf(p, zoom=4)
+        
+        # Return success with list of generated files
+        # This will now correctly find the images inside 'out_dir'
+        files = [f.name for f in out.glob("*") if f.is_file()]
+        return {
+            "status": "success", 
+            "files": files,
+            "summary": "images extracted"
+        }
+        
+    except Exception as e:
+        print(f"ERROR in extract_images: {e}")
+        return {"status": "error", "error": str(e)}
+
+# ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
 # Optional CLI entry point
@@ -117,14 +142,15 @@ if __name__ == "__main__":
     parser.add_argument("input_dir", type=str, help="Path to folder containing PDFs")
     parser.add_argument("output_dir", type=str, help="Path to output folder")
     parser.add_argument("--pdfs", type=str, nargs="+", help="Specific PDF filenames")
-    parser.add_argument("--pattern", type=str, help="Glob pattern (e.g. '*invoice*.pdf')")
-    parser.add_argument("--zoom", type=int, default=4, help="Zoom factor for rendering")
-    args = parser.parse_args()
+    parser.add.argument("--pattern", type=str, help="Glob pattern (e.g. '*invoice*.pdf')")
+    parser.add.argument("--zoom", type=int, default=4, help="Zoom factor for rendering")
+    args = parser.parse.args()
 
     extractor = PDFImageExtractor(args.input_dir, args.output_dir)
     pdf_names = None if not args.pdfs or args.pdfs == ["all"] else args.pdfs
-    extractor.run(pdf_names=pdf_names, pattern=args.pattern, zoom=args.zoom)
-
+    
+    # This is the old .run() method, it's fine for CLI use
+    extractor.process_pdfs(pdf_names=pdf_names, pattern=args.pattern, zoom=args.zoom)
 # ---------------------------------------------------------------------- #
 # import os
 # from pathlib import Path
