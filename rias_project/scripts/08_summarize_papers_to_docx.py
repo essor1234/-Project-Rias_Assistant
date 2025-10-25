@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import json
 import sys
 import datetime
@@ -13,15 +16,12 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 # Logging setup
 # ---------------------------------------------------------------------
 class Tee:
-    def __init__(self, *files):
-        self.files = files
+    def __init__(self, *files): self.files = files
     def write(self, obj):
         for f in self.files:
-            f.write(obj)
-            f.flush()
+            f.write(obj); f.flush()
     def flush(self):
-        for f in self.files:
-            f.flush()
+        for f in self.files: f.flush()
 
 timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 SCRIPT_DIR = Path(__file__).resolve().parent.parent
@@ -31,7 +31,6 @@ LOG_FILE = LOG_DIR / f"summary_log_{timestamp}.txt"
 log_f = open(LOG_FILE, "w", encoding="utf-8")
 sys.stdout = Tee(sys.__stdout__, log_f)
 sys.stderr = Tee(sys.__stderr__, log_f)
-# ---------------------------------------------------------------------
 
 load_dotenv()
 client = OpenAI()
@@ -39,173 +38,210 @@ client = OpenAI()
 # ---------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------
-TXT_DIR = SCRIPT_DIR / "data" / "extracted_text" / "test4"
-IMAGES_DIR = SCRIPT_DIR / "data" / "extracted_image" / "test4" # Folder with images
-PROMPT_PATH = SCRIPT_DIR / "prompts" / "[Prompt]summarize_papers.txt"
-MODEL = "gpt-4o"
-MAX_TOKENS = 8000
-TEMPERATURE = 0.2
-MAX_RETRIES = 3
+TXT_DIR      = SCRIPT_DIR / "data" / "extracted_text" / "test4"
+IMAGES_DIR   = SCRIPT_DIR / "data" / "extracted_image" / "test4"
+PROMPT_PATH  = SCRIPT_DIR / "prompts" / "prompt_test.txt"
+MODEL        = "gpt-5"
+MAX_TOKENS   = 20000
+MAX_RETRIES  = 3
 
-OUTPUT_DIR = SCRIPT_DIR / "data" / "summarize_to_doc_output"
+OUTPUT_DIR   = SCRIPT_DIR / "data" / "summarize_to_doc_output"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-OUTPUT_DOCX = OUTPUT_DIR / "Paper_Summary_Matched.docx"
+OUTPUT_DOCX  = OUTPUT_DIR / "Paper_Summary_Matched.docx"
+
 # ---------------------------------------------------------------------
-
-
-def truncate_text(text, limit=40_000):
+# Helpers
+# ---------------------------------------------------------------------
+def truncate_text(text: str, limit: int = 30_000) -> str:
     return text if len(text) <= limit else text[:limit] + "\n\n[Text truncated for LLM]"
 
-
-def load_prompt():
+def load_prompt() -> str:
     return PROMPT_PATH.read_text(encoding="utf-8")
 
+# ---------------------------------------------------------------------
+# LLM Call (GPT-5 robust version)
+# ---------------------------------------------------------------------
+def call_llm(prompt: str) -> str:
+    """
+    Call GPT-5 and guarantee a valid JSON output string like:
+        {"SummaryDoc": "<document text>"}
+    Handles empty responses, retries, and GPT-5's strict formatting rules.
+    """
 
-def call_llm(prompt_text):
-    """Send text to GPT and retry on failure."""
+    system_msg = {
+        "role": "system",
+        "content": (
+            "You are an academic summarizer and document restorer. "
+            "You MUST output only valid JSON with this schema:\n"
+            "{ \"SummaryDoc\": \"<full reconstructed academic document text including figure markers>\" }"
+        ),
+    }
+
+    user_msg = {"role": "user", "content": prompt}
+
     for attempt in range(MAX_RETRIES):
         try:
             resp = client.chat.completions.create(
                 model=MODEL,
-                messages=[
-                    {"role": "system", "content": "You are a precise academic summarizer and document restorer."},
-                    {"role": "user", "content": prompt_text},
-                ],
-                temperature=TEMPERATURE,
-                max_tokens=MAX_TOKENS,
+                messages=[system_msg, user_msg],
+                max_completion_tokens=MAX_TOKENS,
                 response_format={"type": "json_object"},
             )
-            return resp.choices[0].message.content.strip()
+
+            print("LLM response repr (short):", repr(resp)[:2000])
+            choice = resp.choices[0]
+
+            content = getattr(choice.message, "content", None)
+            if not content:
+                print("⚠️ Empty content field from LLM.")
+                continue
+
+            # Clean and return JSON text
+            cleaned = clean_raw(content)
+            return cleaned.strip()
+
         except Exception as e:
-            print(f"Attempt {attempt+1} failed: {e}")
+            print(f"Attempt {attempt+1}/{MAX_RETRIES} failed: {e}")
             if attempt == MAX_RETRIES - 1:
                 raise
             time.sleep(2 ** attempt)
+
     return ""
 
-
-def clean_raw(raw):
-    """Remove Markdown fences or 'json' prefixes."""
-    if raw.startswith("```"):
-        raw = raw.split("```")[1]
+# ---------------------------------------------------------------------
+# Clean output text before JSON parsing
+# ---------------------------------------------------------------------
+def clean_raw(raw: str) -> str:
     raw = raw.strip()
+    if raw.startswith("```"):
+        raw = raw.split("```", 1)[1].rsplit("```", 1)[0]
     if raw.lower().startswith("json"):
-        raw = raw[4:].strip()
-    return raw
+        raw = raw[4:].lstrip()
+    return raw.strip()
 
-
-def insert_image(doc, img_path, caption_text):
-    """Insert an image + caption to the DOCX."""
+# ---------------------------------------------------------------------
+# Insert image + caption
+# ---------------------------------------------------------------------
+def insert_image(doc: Document, img_path: Path, caption: str):
     try:
-        p = doc.add_paragraph()
-        run = p.add_run()
+        p_img = doc.add_paragraph()
+        p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        run = p_img.add_run()
         run.add_picture(str(img_path), width=Inches(5.5))
-        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-        caption = doc.add_paragraph(caption_text, style="Normal")
-        caption.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        caption.runs[0].italic = True
+        p_cap = doc.add_paragraph(caption, style="Caption")
+        p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        for run_cap in p_cap.runs:
+            run_cap.italic = True
+        doc.add_paragraph()
     except Exception as e:
-        print(f"⚠️ Could not insert image {img_path}: {e}")
+        print(f"Could not insert image {img_path.name}: {e}")
 
+def ensure_caption_style(doc: Document):
+    if "Caption" not in doc.styles:
+        style = doc.styles.add_style("Caption", 1)
+        style.font.name = "Times New Roman"
+        style.font.size = Pt(10)
+        style.font.italic = True
 
-def create_docx(summary_text, output_path, images_dir):
-    """Write the structured summary to a formatted Word DOCX, inserting actual images."""
+# ---------------------------------------------------------------------
+# Build DOCX
+# ---------------------------------------------------------------------
+def create_docx(summary_text: str, output_path: Path, images_dir: Path):
     doc = Document()
-    doc.styles["Normal"].font.name = "Times New Roman"
-    doc.styles["Normal"].font.size = Pt(12)
+    normal = doc.styles["Normal"]
+    normal.font.name = "Times New Roman"
+    normal.font.size = Pt(12)
 
-    image_files = {f.name.lower(): f for f in images_dir.glob("*") if f.suffix.lower() in [".png", ".jpg", ".jpeg", ".tif", ".bmp"]}
+    ensure_caption_style(doc)
 
-    sections = summary_text.split("\n\n")
-    for para in sections:
-        line = para.strip()
+    image_map = {
+        p.name.lower(): p for p in images_dir.iterdir()
+        if p.suffix.lower() in {".png", ".jpg", ".jpeg", ".tif", ".bmp", ".svg"}
+    }
 
-        # Headings
+    print(f"Found {len(image_map)} images in {images_dir}")
+
+    blocks = [b.strip() for b in summary_text.split("\n\n") if b.strip()]
+
+    for block in blocks:
+        line = block.strip()
+
         if line.startswith("###"):
-            doc.add_heading(line.strip("# ").strip(), level=3)
+            doc.add_heading(line.lstrip("# ").strip(), level=3)
         elif line.startswith("##"):
-            doc.add_heading(line.strip("# ").strip(), level=2)
+            doc.add_heading(line.lstrip("# ").strip(), level=2)
         elif line.startswith("#"):
-            doc.add_heading(line.strip("# ").strip(), level=1)
-
-        # Figure placeholders
+            doc.add_heading(line.lstrip("# ").strip(), level=1)
         elif line.startswith("[[FIGURE:"):
             try:
-                # Parse figure placeholder
                 inner = line.strip("[]").replace("FIGURE:", "").strip()
                 parts = [p.strip() for p in inner.split("|")]
-                filename = parts[0].strip()
+                filename = parts[0]
+                caption = " | ".join(parts[1:])
+                img_key = Path(filename).name.lower()
 
-                # Extract caption properly
-                caption_text = ""
-                for part in parts[1:]:
-                    if part.startswith("Caption:"):
-                        caption_text = part.split("Caption:", 1)[1].strip().strip('"')
-                        break
-
-                if not caption_text:
-                    caption_text = " ".join(parts[1:])  # Fallback
-
-                # match image by filename
-                fname = Path(filename).name.lower()
-                if fname in image_files:
-                    insert_image(doc, image_files[fname], caption_text)
+                if img_key in image_map:
+                    insert_image(doc, image_map[img_key], caption)
+                    print(f"Inserted image: {filename}")
                 else:
-                    p = doc.add_paragraph(f"[Image missing: {filename}] {caption_text}", style="Normal")
+                    print(f"Image NOT FOUND: {filename}")
+                    p = doc.add_paragraph(f"[Image missing: {filename}] {caption}", style="Normal")
                     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
             except Exception as e:
-                print(f"⚠️ Error parsing figure line: {e}")
+                print(f"Figure parsing error: {e}\n   Block: {line}")
                 doc.add_paragraph(line, style="Normal")
-
-        # Equations
-        elif "=" in line and any(sym in line for sym in ["=", "Σ", "∑", "∫"]):
-            p = doc.add_paragraph(line, style="Normal")
-            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-
-        # Normal text
         else:
             doc.add_paragraph(line, style="Normal")
 
     doc.save(output_path)
-    print(f"📘 DOCX saved to: {output_path}")
+    print(f"DOCX saved → {output_path}")
 
-
+# ---------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------
 def main():
-    print("\n--- Starting summarization with images ---")
+    print("\n=== Summarization with Images ===")
     base_prompt = load_prompt()
 
     txt_files = sorted(TXT_DIR.glob("*.txt"))
     if not txt_files:
-        print("❌ No .txt files found in:", TXT_DIR)
+        print(f"No .txt files in {TXT_DIR}")
         return
 
-    combined_text = "\n\n".join([f"--- FILE: {f.name} ---\n{truncate_text(f.read_text(encoding='utf-8'))}" for f in txt_files])
+    combined = "\n\n".join(
+        f"--- FILE: {f.name} ---\n{truncate_text(f.read_text(encoding='utf-8'))}"
+        for f in txt_files
+    )
 
-    # Add available image filenames to the input
-    image_files = [f.name for f in IMAGES_DIR.glob("*") if f.suffix.lower() in [".png", ".jpg", ".jpeg", ".tif", ".bmp"]]
-    image_list = "\n\nAvailable image filenames in the images folder (match these exactly for figures):\n" + ", ".join(image_files)
+    prompt = base_prompt.replace("<<<DOCUMENT_TEXT>>>", combined)
+    print(f"Calling LLM ({MODEL}) …")
 
-    prompt_filled = base_prompt.replace("<<<DOCUMENT_TEXT>>>", combined_text + image_list)
+    raw = call_llm(prompt)
 
-    print(f"Processing {len(txt_files)} text files and images from {IMAGES_DIR}...")
-    raw = call_llm(prompt_filled)
-    cleaned = clean_raw(raw)
+    if not raw:
+        print("⚠️ Empty response from LLM. Aborting.")
+        return
 
     try:
-        data = json.loads(cleaned)
-        summary_text = data.get("SummaryDoc", "")
-        if not summary_text.strip():
-            print("⚠️ Empty summary output.")
+        parsed = json.loads(raw)
+    except json.JSONDecodeError:
+        cleaned = clean_raw(raw)
+        try:
+            parsed = json.loads(cleaned)
+        except json.JSONDecodeError:
+            print("❌ Final JSON decode failed. Dumping first 4000 chars:\n")
+            print(raw[:4000])
             return
-        create_docx(summary_text, OUTPUT_DOCX, IMAGES_DIR)
-    except json.JSONDecodeError as e:
-        print("❌ JSON parse error:", e)
-        print(cleaned[:1000])
 
-    print("\n✅ Summarization complete!")
-    print(f"Log saved at: {LOG_FILE}")
+    summary = parsed.get("SummaryDoc", "").strip()
+    if not summary:
+        print("⚠️ LLM returned empty SummaryDoc.")
+        return
 
+    create_docx(summary, OUTPUT_DOCX, IMAGES_DIR)
+    print("\n✅ All done!")
+    print(f"Log: {LOG_FILE}")
 
 if __name__ == "__main__":
     main()
