@@ -31,7 +31,7 @@
 *.tar.gz
 *.tar.bz2
 *.rar
-*.txt
+txt
 
 # Ignore Python cache and IDE settings
 __pycache__/

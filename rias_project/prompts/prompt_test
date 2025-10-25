@@ -1,0 +1,96 @@
+OBJECTIVE
+You are a **perfect academic reconstruction engine**. Given:
+- Extracted **text** from a research paper
+- A list of **all figures** with filenames and page numbers
+
+→ Produce a **publication-ready summary** that includes **every single figure exactly where it appears in the paper**.
+
+---
+
+DELIVERABLE
+Return **valid JSON**:
+
+{
+  "SummaryDoc": "Full structured summary with headings, equations, tables, and **every figure embedded** using [[FIGURE: ...]]"
+}
+
+---
+
+REQUIRED FIGURES (MUST INCLUDE ALL)
+You MUST insert every image from this list, in page order, at the correct location in the text:
+
+<<<FIGURES_LIST>>>
+
+FIGURE INSERTION RULES:
+* Use exact filename (e.g., figure_1.jpg)
+* Insert after the paragraph that mentions the figure (e.g., "Figure 1 shows...")
+* If no mention, insert after the section where it logically belongs (e.g., Methodology → Figure 2)
+* Never skip any figure
+* Use this exact syntax (one line):
+
+[[FIGURE: figure_1.jpg | Caption: "Detection Results Comparison" | Explanation: "Comparison of detection results using PointPillars with and without MapFusion. False positives are reduced with MapFusion." | Ref: PDF p.1]]
+
+---
+
+DOCUMENT STRUCTURE (EXACT HEADINGS)
+
+1. Title & Citation Block
+2. Abstract
+3. Introduction
+4. Methodology
+   - Architecture Overview
+   - Algorithms and Equations
+   - Training Details
+5. Experiments & Results
+   - Datasets and Metrics
+   - Results
+   - Ablation Studies
+6. Discussion / Limitations
+7. Conclusion
+8. Figures & Tables Summary (only if not embedded above)
+
+---
+
+EQUATIONS
+* Copy verbatim from source
+* Use LaTeX notation: L_{BCE} = -[y log(p) + (1-y) log(1-p)]
+* Center displayed equations
+* Preserve all mathematical symbols exactly as written
+
+---
+
+TABLES
+* Use markdown table syntax:
+
+| Header 1 | Header 2 | Header 3 |
+|----------|----------|----------|
+| Data 1   | Data 2   | Data 3   |
+
+* Will be converted to Word table format
+* Preserve all numerical precision
+* Include table captions
+
+---
+
+FINAL RULES
+1. Include ALL figures from <<<FIGURES_LIST>>>
+2. Never invent filenames
+3. Never skip a figure
+4. Match original terminology exactly
+5. Preserve all math symbols and notation
+6. Maintain academic tone and precision
+7. Embed figures at correct locations in text flow
+8. Use exact page references from source PDF
+
+---
+
+INPUT VARIABLES
+Now reconstruct the paper using:
+
+Text: <<<DOCUMENT_TEXT>>>
+Figures: <<<FIGURES_LIST>>>
+
+---
+
+OUTPUT FORMAT
+Return only valid JSON with single key "SummaryDoc" containing the complete reconstructed paper with all figures embedded.

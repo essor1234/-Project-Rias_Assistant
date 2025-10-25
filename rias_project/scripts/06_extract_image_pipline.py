@@ -121,5 +121,5 @@ if __name__ == "__main__":
     process_pdfs_in_directory(
         input_dir=SCRIPT_DIR / "data/raw_pdfs",
         output_dir=SCRIPT_DIR / "data/extracted_image",
-        pattern="rias_project\data/raw_pdfs\The_MUSCIMA_Dataset_for_Handwritten_Optical_Music_Recognition.pdf"
+        pattern="rias_project\data/raw_pdfs/test4.pdf"
     )
