@@ -1,0 +1,21 @@
+# Core LLM chaining and API integration (supports Grok/xAI via custom chains, OpenAI, Anthropic)
+langchain==0.3.1  # For prompt chaining, routing between models, and workflow automation
+
+# PDF text extraction and browsing (essential for ingesting research papers)
+pymupdf==1.24.10  # Fast PDF parsing; handles text, images, and math descriptions
+
+# Excel file manipulation for the comparison template
+openpyxl==3.1.5  # Reads/writes .xlsx files, populates sheets with extracted data
+
+# Word document generation for per-paper summaries
+python-docx==1.1.2  # Creates structured .docx files with sections like Problem Solving, Key Ideas
+
+# API clients for LLMs (Grok via langchain; add these for Claude and GPT)
+anthropic==0.38.0  # Official SDK for Claude API integration
+openai==1.51.0  # Official SDK for GPT models; use with langchain for chaining
+
+# Data handling and efficiency computations (e.g., metrics in .xlsx)
+pandas==2.2.3  # For data frames to compute efficiencies like mAP per Param
+
+# Optional but useful for zipping outputs (built-in zipfile is fine, but this adds convenience if needed)
+# No extra package needed; use Python's standard library for folders/zipping
