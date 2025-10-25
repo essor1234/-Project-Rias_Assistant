@@ -3,6 +3,7 @@
 
 # Ignore data folders
 /rias_project/data/
+/rias_project/logs
 # /rias_project/data/resources/
 /resources/
 
@@ -22,7 +23,7 @@
 *.mp3
 *.log
 *.tmp
-*.txt
+
 *.csv
 *.db
 *.sqlite
@@ -31,7 +32,7 @@
 *.tar.gz
 *.tar.bz2
 *.rar
-txt
+
 
 # Ignore Python cache and IDE settings
 __pycache__/

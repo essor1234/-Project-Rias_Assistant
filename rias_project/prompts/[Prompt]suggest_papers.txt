@@ -1,0 +1,38 @@
+Objective:
+From the provided research paper text, identify and recommend related academic papers.
+
+Instructions:
+1. Read and understand the provided paper text.
+2. If the text includes a References or Related Works section, use that information.
+3. Suggest 3–5 additional related or follow-up papers (from known research or general relevance).
+4. For each suggested paper, provide:
+   - File name or Title (short and descriptive)
+   - Main author(s)
+   - Summary information (2–4 sentence abstract)
+   - 3–5 key related keywords
+   - Reference link in IEEE style (if known, otherwise leave blank)
+
+Output:
+Return valid JSON with the following structure:
+
+{
+  "Suggestions": [
+    {
+      "File Name": "MapFusion: A General Framework for 3D Object Detection with HDMaps",
+      "Author": "Liang Chen, Wei Zhao",
+      "Summary Information": "This paper proposes a unified model integrating HD maps with LiDAR features...",
+      "Keywords": ["3D Object Detection", "Autonomous Driving", "HD Maps"],
+      "Reference Link": "L. Chen et al., 'MapFusion: A General Framework...', IEEE CVPR 2023."
+    }
+  ]
+}
+
+Rules:
+- Return only valid JSON (no markdown or commentary).
+- If no references are found, infer related works based on the paper’s topic.
+- Limit output to at most 5 suggestions per input paper.
+
+Now analyze and suggest related works for this paper:
+<<<DOCUMENT_TEXT>>>
+
+

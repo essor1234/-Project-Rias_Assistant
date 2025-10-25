@@ -1,0 +1,24 @@
+Objective:
+Extract structured metadata and quantitative results from a single research paper text.
+
+Output:
+Return valid JSON containing two lists:
+{
+  "Overview": [ { "ColumnName1": "...", "ColumnName2": "..." } ],
+  "Results": [ { "ColumnName1": "...", "ColumnName2": "..." } ]
+}
+
+Column names must exactly match the Excel headers from the template below.
+
+Template — Sheets and Headers:
+- Overview: PaperID | Title | Year | Venue | URL/DOI | Task | Subtask | Train Datasets | Model Family | Backbone | Neck/Head | Key Idea (1-liner) | Input Resolution | Params (M) | FLOPs (G) | Pretrain | Losses | Optimizer | LR Schedule | Epochs | Batch Size | Augmentations (key) | Inference Tricks | Compute (train) | Code URL | Weights URL | Notes
+- Results: PaperID | Dataset | Split | Eval Resolution | Eval Hardware | Primary Metric Name | Primary Metric Value | mAP@50 | mAP@50-95 | Precision | Recall | F1 | Top-1 Acc | Top-5 Acc | IoU | Dice | AP_small | AP_medium | AP_large | FPS | Latency (ms) | Memory (GB) | TTA (Y/N) | Seed | Repeats | StdDev/CI | Params (M) [from Overview] | FLOPs (G) [from Overview] | Eff: mAP@50-95 per Param | Eff: F1 per Param
+
+Rules:
+- Extract only data explicitly mentioned in the paper text.
+- Leave missing values blank ("").
+- Use PaperID = "P01" for this paper.
+- Output must be valid JSON only — no markdown, no commentary.
+
+Now analyze the following research paper and fill all relevant fields:
+<<<DOCUMENT_TEXT>>>
