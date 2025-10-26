@@ -66,7 +66,7 @@ class PaperSuggester:
 
         # --- LLM settings ---
         self.model = "gpt-4o"
-        self.max_tokens = 2500
+        self.max_tokens = 10000
         self.temperature = 0.4
         self.max_retries = 3
         self.client = OpenAI()

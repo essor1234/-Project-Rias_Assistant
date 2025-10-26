@@ -4,6 +4,7 @@
 # Ignore data folders
 /rias_project/data/
 /rias_project/logs
+/rias_project/results
 # /rias_project/data/resources/
 /resources/
 
