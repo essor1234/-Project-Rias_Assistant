@@ -1,0 +1,5 @@
+{
+  "name": "Rias Research Assistant",
+  "description": "An intelligent research assistant named Rias that helps users learn better by processing uploaded documents and generating summaries, presentations, and data sheets. Features an in-app file viewer and allows downloading all results as a zip archive.",
+  "requestFramePermissions": []
+}
