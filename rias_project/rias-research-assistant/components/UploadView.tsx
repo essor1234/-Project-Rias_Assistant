@@ -63,7 +63,7 @@ export const UploadView: React.FC<UploadViewProps> = ({
                   download
                   className="w-full px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-emerald-500 flex items-center justify-center"
                 >
-                  Download Merged Results
+                  Download All Results (.zip)
                 </a>
               </div>
             )}

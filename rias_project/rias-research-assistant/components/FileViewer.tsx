@@ -8,7 +8,7 @@ interface FileViewerProps {
 }
 
 // This is the base URL of our backend's static file server
-const STATIC_BASE_URL = "http://localhost:8000/static-results";
+const STATIC_BASE_URL = "http://localhost:8000" + '/static-results';
 
 export const FileViewer: React.FC<FileViewerProps> = ({ filePath, onClose }) => {
   

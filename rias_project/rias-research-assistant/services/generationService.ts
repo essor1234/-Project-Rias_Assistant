@@ -78,5 +78,5 @@ export async function checkJobStatus(sessionId: string): Promise<JobStatus> {
  * Helper function to get the full download URL for a completed job.
  */
 export function getDownloadUrl(sessionId: string): string {
-  return `${API_BASE_URL}/download-result/${sessionId}`;
+  return `${API_BASE_URL}/download-zip/${sessionId}`; // <-- Change this line
 }
