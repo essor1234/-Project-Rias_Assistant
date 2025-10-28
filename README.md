@@ -1,7 +1,7 @@
 # Project RIAS — Research/AI Assistant
 
 Turn research PDFs into production-ready assets.
-Upload once → **DOCX summary** (figures in the right spots), **step-by-step slides**, and an **Excel workbook** with clean result tables. 
+Upload once → **DOCX summary** (figures in the right spots), **LAB Python code exercises**,**step-by-step slides**, and an **Excel workbook** with clean result tables. 
 
 > Local **TypeScript** UI • Equation-safe extraction • No hallucinated facts • Repeatable templates
 
