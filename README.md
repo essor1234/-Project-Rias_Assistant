@@ -71,7 +71,7 @@ Open the local URL shown in the terminal.
 ## 🖱️ How to Use
 
 1. **Upload PDF** (single paper to start).
-2. Choose outputs (**DOCX / PPTX / lAB / XLSX**) and options:
+2. Choose outputs (**DOCX / PPTX / LAB / XLSX**) and options:
 
    * “Preserve Equations” (on)
    * “Figure Alignment” (on)
