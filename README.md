@@ -114,7 +114,7 @@ Open the local URL shown in the terminal.
 ├─ exporters/
 │  ├─ docx/
 │  ├─ pptx/
-│  └─ lab/
+│  ├─ lab/
 │  └─ xlsx/
 ├─ parsers/             # pdf/text/figure utilities (optional python/)
 ├─ prompts/             # summary/slides/results templates
