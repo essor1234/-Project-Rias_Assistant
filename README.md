@@ -92,6 +92,11 @@ Open the local URL shown in the terminal.
 
   * 2–3 slides per concept: idea → equation/relationship → small example.
   * Kid-friendly wording but faithful to the paper.
+ 
+* **LAB**
+
+  * 2–3 Exercise code Python. If you have no prior knowledge of programming skills, don't worry about that.
+  * The exercise can show you how to running basicly and very friendly
 
 * **XLSX**
 
@@ -109,6 +114,7 @@ Open the local URL shown in the terminal.
 ├─ exporters/
 │  ├─ docx/
 │  ├─ pptx/
+│  └─ lab/
 │  └─ xlsx/
 ├─ parsers/             # pdf/text/figure utilities (optional python/)
 ├─ prompts/             # summary/slides/results templates
@@ -145,12 +151,11 @@ Please include a minimal PDF sample, expected outputs, and which template you us
 ---
 
 ## 📄 License
-
 ---
 
 ## 👤 Maintainer
 
-** Jericho/ essor1234** — Computer Vision & AI Engineer
+** Jericho/ essor1234** — Computer Science - Computer Vision & AI Engineer
 Focus: detection/segmentation, equation-safe extraction, and edge-friendly tooling.
 
 ---
