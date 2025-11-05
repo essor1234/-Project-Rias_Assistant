@@ -30,7 +30,7 @@ Upload once → **DOCX summary** (figures in the right spots), **LAB Python code
 [Prompt Orchestrator (.ts)]
     ├─ Summary template  → DOCX Exporter
     ├─ Slides template   → PPTX Exporter
-    ├─ Lab template   → LAB Exporter
+    ├─ Lab template      → LAB Exporter
     └─ Results template  → XLSX Exporter
     (equation guardrails + metric validators)
     ↓
